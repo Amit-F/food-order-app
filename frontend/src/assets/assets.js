@@ -3,7 +3,7 @@
 import about_img from "./about_img.png";
 import hero_img from "./hero_img.png";
 import contact_img from "./contact_img.png";
-import logo from "./logo.png";
+import logo from "./feed_me_logo.png";
 import razorpay_logo from "./razorpay_logo.png";
 import stripe_logo from "./stripe_logo.png";
 
@@ -105,6 +105,7 @@ import steak_with_fat from "./steak_with_fat.png";
 import steaks_on_cutting_board from "./steaks_on_cutting_board.png";
 import steak_slices from "./steak_slices.png";
 import pickles from "./pickles.png";
+import wine_fruit from "./wine_fruit.png";
 import wing_shaped_pasta_with_sauce_close from "./wing_shaped_pasta_with_sauce_close.png";
 import wing_shaped_pasta_with_tomato_sauce from "./wing_shaped_pasta_with_tomato_sauce.png";
 
@@ -635,20 +636,20 @@ export const products = [
     bestseller: false,
     additionalPrepTime: true,
   },
-  {
-    _id: "plain-congee",
-    name: "Plain Congee",
-    description: "Slow-cooked rice porridge with a smooth, comforting texture.",
-    price: 8,
-    timeToPrepare: 120,
-    image: congee,
-    category: "breakfast",
-    subCategory: "healthy",
-    sizes: ["2", "4", "6", "8", "10"],
-    date: Date.now(),
-    bestseller: false,
-    additionalPrepTime: false,
-  },
+  // {
+  //   _id: "plain-congee",
+  //   name: "Plain Congee",
+  //   description: "Slow-cooked rice porridge with a smooth, comforting texture.",
+  //   price: 8,
+  //   timeToPrepare: 120,
+  //   image: congee,
+  //   category: "breakfast",
+  //   subCategory: "healthy",
+  //   sizes: ["2", "4", "6", "8", "10"],
+  //   date: Date.now(),
+  //   bestseller: false,
+  //   additionalPrepTime: false,
+  // },
   {
     _id: "congee-with-eggs",
     name: "Congee with Eggs",
