@@ -147,7 +147,7 @@ export const products = [
     subCategory: ["cocktails", "beverages"],
     sizes: ["2", "4", "6", "8", "10"],
     date: Date.now(),
-    bestseller: true,
+    bestseller: false,
     additionalPrepTime: false,
   },
   {
@@ -167,7 +167,7 @@ export const products = [
     subCategory: ["healthy", "appetizer"],
     sizes: ["2", "4", "6", "8", "10"],
     date: Date.now(),
-    bestseller: true,
+    bestseller: false,
     additionalPrepTime: false,
   },
   {
@@ -181,7 +181,7 @@ export const products = [
     subCategory: ["healthy", "soup"],
     sizes: ["2", "4", "6", "8", "10"],
     date: Date.now(),
-    bestseller: true,
+    bestseller: false,
     additionalPrepTime: true,
   },
   {
@@ -209,7 +209,7 @@ export const products = [
     subCategory: "baked",
     sizes: ["2", "4", "6", "8", "10"],
     date: Date.now(),
-    bestseller: true,
+    bestseller: false,
     additionalPrepTime: true,
   },
   {
