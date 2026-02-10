@@ -195,7 +195,7 @@ export const products = [
     subCategory: ["healthy", "soup"],
     sizes: ["2", "4", "6", "8", "10"],
     date: Date.now(),
-    bestseller: true,
+    bestseller: false,
     additionalPrepTime: true,
   },
   {
@@ -223,7 +223,7 @@ export const products = [
     subCategory: ["baked", "main"],
     sizes: ["2", "4", "6", "8", "10"],
     date: Date.now(),
-    bestseller: true,
+    bestseller: false,
     additionalPrepTime: true,
   },
   {
