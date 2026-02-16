@@ -38,16 +38,20 @@ const Collection = () => {
     let productsCopy = products.slice();
 
     if (category.length > 0) {
-      productsCopy = productsCopy.filter(item => category.includes(item.category));
+      productsCopy = productsCopy.filter(item => item.category.some(cat => category.includes(cat)));
+    }
+
+    if (subCategory.length > 0) {
+      productsCopy = productsCopy.filter(item => item.subCategory.some(sub => subCategory.includes(sub)));
     }
 
     setFilterProducts(productsCopy);
   }
 
 
-  useEffect(()=>{
-    setFilterProducts(products);
-  },[])
+  // useEffect(()=>{
+  //   setFilterProducts(products);
+  // },[])
 
   useEffect(()=>{
     applyFilter();
