@@ -256,7 +256,7 @@ export const products = [
   },
   {
     _id: "carbonara-pizza",
-    name: "Pizza Carbonara",
+    name: "Carbonara Pizza",
     description: "White pizza inspired by carbonara with cheese and cured meat.",
     price: 22,
     timeToPrepare: 30,
