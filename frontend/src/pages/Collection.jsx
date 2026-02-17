@@ -11,6 +11,7 @@ const Collection = () => {
   const [filterProducts, setFilterProducts] = useState([]);
   const [category, setCategory] = useState([]);
   const [subCategory, setSubcategory] = useState([]);
+  const [sortType, setSortType] = useState('relevant');
 
   const toggleCategory = (e) => {
 
@@ -49,6 +50,26 @@ const Collection = () => {
   }
 
 
+  const sortProduct = () => {
+
+    let fpCopy = filterProducts.slice();
+
+    switch (sortType) {
+      case 'low-high':
+        setFilterProducts(fpCopy.sort((a, b) => a.price - b.price));
+        break;
+      case 'high-low':
+        setFilterProducts(fpCopy.sort((a, b) => b.price - a.price));
+        break;
+      default:
+        applyFilter();
+        break;
+
+    }
+
+  }
+
+
   // useEffect(()=>{
   //   setFilterProducts(products);
   // },[])
@@ -56,6 +77,10 @@ const Collection = () => {
   useEffect(()=>{
     applyFilter();
   }, [category, subCategory])
+
+  useEffect(()=>{
+    sortProduct(); // Sorts whenever filterProducts changes or sortType changes
+  }, [sortType])
 
   return (
     <div className='flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t'>
@@ -94,7 +119,7 @@ const Collection = () => {
               <input className='w-3' type="checkbox" value={'Appetizer'} onChange={toggleSubCategory} /> Appetizer
             </p>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'Main Course'} onChange={toggleSubCategory} /> Main Course
+              <input className='w-3' type="checkbox" value={'Main'} onChange={toggleSubCategory} /> Main Course
             </p>
             <p className='flex gap-2'>
               <input className='w-3' type="checkbox" value={'Healthy'} onChange={toggleSubCategory} /> Healthy
@@ -130,7 +155,7 @@ const Collection = () => {
         <div className='flex justify-between text-base sm:text-2xl mb-4'>
           <Title text1={'ALL'} text2={'COLLECTIONS'}></Title>
           {/* Product Sort */}
-          <select className='border-2 border-gray-300 text-sm px-2' name="sort" id="sort">
+          <select onChange={(e)=>setSortType(e.target.value)} className='border-2 border-gray-300 text-sm px-2' name="sort" id="sort">
             <option value="relevant">Sort by: Relevant</option>
             <option value="low-high"> Price: Low to High</option>
             <option value="high-low"> Price: High to Low</option>
