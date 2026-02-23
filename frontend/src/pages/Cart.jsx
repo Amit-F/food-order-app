@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { ShopContext } from '../context/ShopContext'
 import Title from '../components/Title';
+import { assets } from '../assets/assets';
+import CartTotal from '../components/CartTotal';
 
 const Cart = () => {
 
-  const { products, currency, cartItems} = useContext(ShopContext);
+  const { products, currency, cartItems, updateQuantity} = useContext(ShopContext);
 
   const [cartData,setCartData] = useState([]);
 
@@ -51,17 +53,33 @@ const Cart = () => {
                       <p>Price Per Serving: {currency}{productData.price}</p>
                       <p className='px-2 sm:px-3 sm:py-1 border bg-slate-50'>Number of Servings: {item.servingAmount}</p>
                       <p>Quantity: </p>
-                      <input className='border max-w-10 sm:mx-w-20 px-1 sm:px-2 py-1' type="number" min={1} defaultValue={item.quantity}/>
+                      <input 
+                        className='border max-w-10 sm:max-w-20 px-1 sm:px-2 py-1' 
+                        type="number" 
+                        min={1} 
+                        value={item.quantity} 
+                        onChange={(e) => {
+                          const nextQty = Math.max(1, Number(e.target.value) || 1);
+                          updateQuantity(item._id, item.servingAmount, nextQty);
+                          }} 
+                      />
                       {/* <p>Total Item Price: {currency}{productData.price * item.servingAmount}</p> */}
                     </div>
                   </div>
                 </div>
                 <p>Total Item Price: {currency}{productData.price * item.servingAmount * item.quantity}</p>
                 {/* <input className='border max-w-10 sm:mx-w-20 px-1 sm:px-2 py-1' type="number" min={1} defaultValue={item.quantity}/> */}
+                <img onClick={()=>updateQuantity(item._id, item.servingAmount, 0)} className='w-4 mr-4 sm:w-5 cursor-pointer' src={assets.bin_icon} alt="" />
               </div>
             )
           })
         }
+      </div>
+
+      <div className='flex justify-end my-20'>
+        <div className='w-full sm:w-[450px]'>
+          <CartTotal />
+        </div>
       </div>
 
     </div>
