@@ -463,7 +463,7 @@ export const products = [
     _id: "slow-cooked-brisket",
     name: "Slow Cooked Brisket",
     description: "Tender beef brisket slow-cooked until juicy and flavorful.",
-    price: 500,
+    price: 65,
     timeToPrepare: 480,
     image: [brisket],
     category: ["Dinner"],
