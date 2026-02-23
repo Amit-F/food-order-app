@@ -6,6 +6,9 @@ import contact_img from "./contact_img.png";
 import logo from "./feed_me_logo.png";
 import razorpay_logo from "./razorpay_logo.png";
 import stripe_logo from "./stripe_logo.png";
+import bit_logo from "./bit_logo.png"
+import paybox_logo from "./paybox_logo.png"
+
 
 // UI Icons
 import bin_icon from "./bin_icon.png";
@@ -121,11 +124,13 @@ export const assets = {
   contact_img,
   razorpay_logo,
   bin_icon,
+  bit_logo,
   cart_icon,
   cross_icon,
   dropdown_icon,
   exchange_icon,
   menu_icon,
+  paybox_logo,
   profile_icon,
   quality_icon,
   search_icon,
