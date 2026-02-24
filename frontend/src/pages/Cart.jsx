@@ -6,7 +6,7 @@ import CartTotal from '../components/CartTotal';
 
 const Cart = () => {
 
-  const { products, currency, cartItems, updateQuantity, navigate} = useContext(ShopContext);
+  const { products, currency, cartItems, updateQuantity, navigateAndScroll} = useContext(ShopContext);
 
   const [cartData,setCartData] = useState([]);
 
@@ -34,7 +34,7 @@ const Cart = () => {
   return (
     <div className='border-t pt-14'>
       
-      <div className='text-2xl mb-3'>
+      <div className='mb-3 text-2xl'>
         <Title text1={'YOUR'} text2={'CART'}/>
       </div>
 
@@ -51,10 +51,10 @@ const Cart = () => {
                     <p className='text-xs sm:text-lg font-m'>{productData.name}</p>
                     <div className='flex items-center gap-5 mt-2'>
                       <p>Price Per Serving: {currency}{productData.price}</p>
-                      <p className='px-2 sm:px-3 sm:py-1 border bg-slate-50'>Number of Servings: {item.servingAmount}</p>
+                      <p className='px-2 border sm:px-3 sm:py-1 bg-slate-50'>Number of Servings: {item.servingAmount}</p>
                       <p>Quantity: </p>
                       <input 
-                        className='border max-w-10 sm:max-w-20 px-1 sm:px-2 py-1' 
+                        className='px-1 py-1 border max-w-10 sm:max-w-20 sm:px-2' 
                         type="number" 
                         min={1} 
                         value={item.quantity} 
@@ -68,8 +68,8 @@ const Cart = () => {
                   </div>
                 </div>
                 <p>Total Item Price: {currency}{productData.price * item.servingAmount * item.quantity}</p>
-                {/* <input className='border max-w-10 sm:mx-w-20 px-1 sm:px-2 py-1' type="number" min={1} defaultValue={item.quantity}/> */}
-                <img onClick={()=>updateQuantity(item._id, item.servingAmount, 0)} className='w-4 mr-4 sm:w-5 cursor-pointer' src={assets.bin_icon} alt="" />
+                {/* <input className='px-1 py-1 border max-w-10 sm:mx-w-20 sm:px-2' type="number" min={1} defaultValue={item.quantity}/> */}
+                <img onClick={()=>updateQuantity(item._id, item.servingAmount, 0)} className='w-4 mr-4 cursor-pointer sm:w-5' src={assets.bin_icon} alt="" />
               </div>
             )
           })
@@ -80,7 +80,7 @@ const Cart = () => {
         <div className='w-full sm:w-[450px]'>
           <CartTotal />
           <div className='w-full text-end'>
-            <button onClick={()=> cartData.length > 0 ? navigate('/place-order') : null} className='bg-black text-white text-sm my-8 px-8 py-3'>PROCEED TO CHECKOUT</button>
+            <button onClick={()=> cartData.length > 0 ? navigateAndScroll('/place-order') : null} className='px-8 py-3 my-8 text-sm text-white bg-black'>PROCEED TO CHECKOUT</button>
           </div>
         </div>
       </div>

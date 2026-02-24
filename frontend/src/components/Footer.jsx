@@ -1,32 +1,55 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { assets } from '../assets/assets'
+import { ShopContext } from '../context/ShopContext';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
+
+    const {navigateAndScroll} = useContext(ShopContext);
+    
+    
   return (
     <div>
         <div className='flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10 mt-40 text-sm'>
             <div>
-                <img src={assets.logo} className='mb-5 w-32' alt="" />
-                <p className='w-full med:w-2/3 text-gray-600'>
-                    Dummy Text Footer
-                </p>
+                <Link to={'/'} onClick={(e)=>{
+                    if (location.pathname === "/") {
+                        e.preventDefault;
+                        window.scrollTo({ top:0, behavior:"smooth"});
+                    }
+                }} ><img src={assets.logo} className='w-32 mb-5' alt="" /></Link>
             </div>
 
             <div>
-                <p className='text-xl font-medium mb-5'>COMPANY</p>
+                <p className='mb-5 text-xl font-medium'>PAGES</p>
                 <ul className='flex flex-col gap-1 text-gray-600'>
-                    <li>Home</li>
-                    <li>About</li>
-                    <li>Delivery</li>
-                    <li>Provacy Policy</li>
+                    <li onClick={()=>navigateAndScroll('/')} className='transition cursor-pointer hover:text-blue-600'>Home</li>
+                    <li onClick={()=>navigateAndScroll('/collection')} className='transition cursor-pointer hover:text-blue-600'>Collection</li>
+                    <li onClick={()=>navigateAndScroll('/about')} className='transition cursor-pointer hover:text-blue-600'>About</li>
+                    <li onClick={()=>navigateAndScroll('/contact')} className='transition cursor-pointer hover:text-blue-600'>Contact</li>
                 </ul>
             </div>
 
             <div>
-                <p className='text-xl font-medium mb-5'>GET IN TOUCH</p>
+                <p className='mb-5 text-xl font-medium'>GET IN TOUCH</p>
                 <ul className='flex flex-col gap-1 text-gray-600'>
-                    <li>+972-58-629-1144</li>
-                    <li>amitfink@gmail.com</li>
+                    <li>
+                    <a
+                        href="tel:+972586291144"
+                        className="transition hover:text-blue-600"
+                    >
+                        058-629-1144
+                    </a>
+                    </li>
+
+                    <li>
+                    <a
+                        href="mailto:amitfink@gmail.com?subject=We'd Like To Hire You!"
+                        className="transition hover:text-blue-600"
+                    >
+                        amitfink@gmail.com
+                    </a>
+                    </li>
                 </ul>
             </div>
         </div>

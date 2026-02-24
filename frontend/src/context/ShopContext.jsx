@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { products } from "../assets/assets";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const ShopContext = createContext();
 
@@ -13,6 +13,7 @@ const ShopContextProvider = (props) => {
     const [showSearch, setShowSearch] = useState(false);
     const [cartItems,setCartItems] = useState({});
     const navigate = useNavigate();
+    const location = useLocation();
 
     const addToCart = async (itemId, servingAmount) => {
 
@@ -36,11 +37,9 @@ const ShopContextProvider = (props) => {
             cartData[itemId][servingAmount] = 1;
         }
         setCartItems(cartData);
-
     }
 
     
-
     const getCartCount = () => {
         let totalCount = 0;
         for(const items in cartItems){
@@ -58,14 +57,13 @@ const ShopContextProvider = (props) => {
         return totalCount
     }
 
+
     const updateQuantity = async (itemId, servingAmount, quantity) => {
         let cartData = structuredClone(cartItems);
-
         cartData[itemId][servingAmount] = quantity;
-
         setCartItems(cartData);
-
     }
+
 
     const getCartAmount = () => {
         let totalAmount = 0;
@@ -78,12 +76,22 @@ const ShopContextProvider = (props) => {
                         totalAmount += itemInfo.price * servingAmount * quantity; // total amount of all the products in the cart
                     }
                 } catch (error) {
-                    
                 }
             }
         }
         return totalAmount;
     }
+
+
+    const navigateAndScroll = (path) => {
+        if (location.pathname === path) {
+            window.scrollTo({ top: 0, behavior: 'smooth'});
+        }
+        else{
+            navigate(path);
+        }
+    }
+
 
     const value = {
         products,
@@ -98,7 +106,9 @@ const ShopContextProvider = (props) => {
         getCartCount,
         updateQuantity,
         getCartAmount,
-        navigate
+        navigate,
+        location,
+        navigateAndScroll
 
     }
 

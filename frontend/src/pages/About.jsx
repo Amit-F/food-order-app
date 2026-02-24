@@ -27,7 +27,7 @@ const About = () => {
             <p className='mt-1 text-sm leading-relaxed text-gray-700 whitespace-pre-line'>
               {aboutMeText}
             </p>
-            <b>About Feed Me:</b>
+            <b>About "Feed Me":</b>
             <p className='mt-1 text-sm leading-relaxed text-gray-700 whitespace-pre-line'>
               {projectText}
             </p>

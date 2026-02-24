@@ -29,11 +29,11 @@ const Product = () => {
   },[productId, products])
 
   return productData ? (
-    <div className='border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100'>
+    <div className='pt-10 transition-opacity duration-500 ease-in border-t-2 opacity-100'>
       {/* ------- Product Data ------- */}
-      <div className='flex gap-12 sm:gap-12 flex-col sm:flex-row'>
+      <div className='flex flex-col gap-12 sm:gap-12 sm:flex-row'>
         {/* ------- Product Images ------- */}
-        <div className='flex-1 flex flex-col-reverse gap-3 sm:flex-row'>
+        <div className='flex flex-col-reverse flex-1 gap-3 sm:flex-row'>
           <div className='flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full'>
             {
               productData.image.map((item, index)=> (
@@ -47,7 +47,7 @@ const Product = () => {
         </div>
         {/* ------- Product Information ------- */}
         <div className='flex-1'>
-            <h1 className='font-medium text-2xl mt-2'>{productData.name}</h1>
+            <h1 className='mt-2 text-2xl font-medium'>{productData.name}</h1>
             <div className='flex items-center gap-1 mt-2'>
               <img src={assets.star_icon} alt="" className="w-3 5" />
               <img src={assets.star_icon} alt="" className="w-3 5" />
@@ -67,9 +67,9 @@ const Product = () => {
                 ))}
               </div>
             </div>
-            <button onClick={()=>addToCart(productData._id,servingAmount)} className='bg-black text-white px-8 py-3 text-sm active:bg-gray-700'>ADD TO CART</button>
+            <button onClick={()=>addToCart(productData._id,servingAmount)} className='px-8 py-3 text-sm text-white bg-black active:bg-gray-700'>ADD TO CART</button>
             <hr className='mt-8 sm:w-4/5'/>
-            <div className='text-sm text-gray-500 mt-5 flex flex-col gap-1'>
+            <div className='flex flex-col gap-1 mt-5 text-sm text-gray-500'>
               <p>100% Original Product.</p> {/* TODO Change to make relevant */}
               <p>Cash on delivery is available on this product.</p>
               <p>Easy return and exchange policy within 7 days.</p>
@@ -82,10 +82,10 @@ const Product = () => {
 
       <div className='mt-20'>
         <div className='flex'>
-          <b className='border px-5 py-3 text-sm'>Description</b>
-          <p className='border px-5 py-3 text-sm'>Reviews (2)</p> {/* TODO Hardcoded review count*/}
+          <b className='px-5 py-3 text-sm border'>Description</b>
+          <p className='px-5 py-3 text-sm border'>Reviews (2)</p> {/* TODO Hardcoded review count and no reactive description/reviews button */}
         </div>
-        <div className='flex flex-col gap-4 border px-6 py-6 text-sm text-gray-500'>
+        <div className='flex flex-col gap-4 px-6 py-6 text-sm text-gray-500 border'>
          <p>Dummy Text</p>
          <p>More dummy text in the description box</p>
         </div>
