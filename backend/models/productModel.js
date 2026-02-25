@@ -9,7 +9,7 @@ const productSchema = new mongoose.Schema({
     category: { type:Array, required:true },
     subCategory: { type:Array, required:true },
     servings: { type:Array, required:true },
-    date: { type:Date, default:Date.now, required:true },
+    date: { type:Date, default:Date.now },
     bestSeller: { type:Boolean, default:false, required:true },
     additionalPrepTime: { type:Boolean, default:false, required:true }
 })
