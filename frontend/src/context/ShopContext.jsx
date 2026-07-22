@@ -1,5 +1,4 @@
 import { createContext, useEffect, useState } from "react";
-import { products } from "../assets/assets";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -20,8 +19,54 @@ const ShopContextProvider = (props) => {
         const stored = localStorage.getItem('user');
         return stored ? JSON.parse(stored) : null;
     });
+    const [meals, setMeals] = useState([]);
+    const products = meals; // legacy alias used by pages not yet reworked (Cart/PlaceOrder, milestone 3)
     const navigate = useNavigate();
     const location = useLocation();
+
+
+    const authHeader = () => ({ headers: { Authorization: `Bearer ${token}` } });
+
+
+    const fetchMeals = async () => {
+        try {
+            const response = await axios.get(backendUrl + '/api/meal/list', authHeader());
+            if (response.data.success) {
+                setMeals(response.data.meals);
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+
+    const addMeal = async (formData) => {
+        try {
+            const response = await axios.post(backendUrl + '/api/meal/add', formData, authHeader());
+            if (response.data.success) {
+                toast.success('Meal added!');
+                await fetchMeals();
+                return true;
+            } else {
+                toast.error(response.data.message);
+                return false;
+            }
+        } catch (error) {
+            toast.error(error.message);
+            return false;
+        }
+    }
+
+
+    useEffect(() => {
+        if (token) {
+            fetchMeals();
+        } else {
+            setMeals([]);
+        }
+    }, [token])
 
 
     const applySession = (token, user) => {
@@ -168,6 +213,9 @@ const ShopContextProvider = (props) => {
 
     const value = {
         products,
+        meals,
+        fetchMeals,
+        addMeal,
         currency,
         delivery_fee,
         search,

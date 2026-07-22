@@ -9,6 +9,7 @@ import Cart from './pages/Cart'
 import Login from './pages/Login'
 import JoinHousehold from './pages/JoinHousehold'
 import Invite from './pages/Invite'
+import AddMeal from './pages/AddMeal'
 import PlaceOrder from './pages/PlaceOrder'
 import Orders from './pages/Orders'
 import Navbar from './components/Navbar'
@@ -36,6 +37,7 @@ const App = () => {
         <Route path='/login' element={<Login/>} />
         <Route path='/join/:code' element={<JoinHousehold/>} />
         <Route path='/invite' element={<Invite/>} />
+        <Route path='/add-meal' element={<AddMeal/>} />
         <Route path='/place-order' element={<PlaceOrder/>} />
         <Route path='/orders' element={<Orders/>} />
       </Routes>

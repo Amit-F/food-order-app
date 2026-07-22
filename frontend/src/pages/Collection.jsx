@@ -6,13 +6,12 @@ import ProductItem from '../components/ProductItem';
 
 const Collection = () => {
 
-  const { products, search, showSearch } = useContext(ShopContext);
+  const { meals, search, showSearch } = useContext(ShopContext);
 
   const [showFilter, setShowFilter] = useState(true);
 
   const [category, setCategory] = useState([]);
   const [subCategory, setSubcategory] = useState([]);
-  const [sortType, setSortType] = useState('relevant');
 
   const toggleCategory = (e) => {
     const value = e.target.value;
@@ -26,14 +25,14 @@ const Collection = () => {
   }
   
 
-  const filteredAndSortedProducts = useMemo(() => {
+  const filteredMeals = useMemo(() => {
 
-    let list = products.slice();
+    let list = meals.slice();
 
     // Search filter
     if (showSearch && search) {
       const q = search.toLowerCase();
-      list = list.filter((item) => item.name.toLowerCase().includes(q)); 
+      list = list.filter((item) => item.name.toLowerCase().includes(q));
     }
 
     // Category overlap filter
@@ -46,18 +45,9 @@ const Collection = () => {
       list = list.filter((item) => item.subCategory?.some((sub) => subCategory.includes(sub)));
     }
 
-    // Sorting
-    if (sortType === 'low-high') {
-      list.sort((a, b) => a.price - b.price);
-    }
-    else if (sortType === 'high-low') {
-      list.sort((a, b) => b.price - a.price);
-    }
-    // 'relevant keeps original order
-
     return list;
 
-  },[products, search, showSearch, category, subCategory, sortType])
+  },[meals, search, showSearch, category, subCategory])
 
 
   return (
@@ -133,20 +123,14 @@ const Collection = () => {
 
       <div className='flex-1'>
         <div className='flex justify-between mb-4 text-base sm:text-2xl'>
-          <Title text1={'ALL'} text2={'COLLECTIONS'} />
-          {/* Product Sort */}
-          <select onChange={(e)=>setSortType(e.target.value)} value={sortType} className='px-2 text-sm border-2 border-gray-300' name="sort" id="sort">
-            <option value="relevant">Sort by: Relevant</option>
-            <option value="low-high"> Price: Low to High</option>
-            <option value="high-low"> Price: High to Low</option>
-          </select>
+          <Title text1={'ALL'} text2={'MEALS'} />
         </div>
 
-        {/* Map Products */}
+        {/* Map Meals */}
         <div className='grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 gap-y-6'>
           {
-            filteredAndSortedProducts.map((item)=>(
-              <ProductItem key={item._id} name={item.name} id={item._id} price={item.price} image={item.image} />
+            filteredMeals.map((item)=>(
+              <ProductItem key={item._id} name={item.name} id={item._id} image={item.image} />
             ))
           }
         </div>

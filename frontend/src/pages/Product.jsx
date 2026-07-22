@@ -7,18 +7,17 @@ import RelatedProducts from '../components/RelatedProducts';
 const Product = () => {
 
   const {productId} = useParams();
-  const {products, currency, addToCart} = useContext(ShopContext);
+  const {meals, addToCart} = useContext(ShopContext);
   const [productData,setProductData] = useState(false);
   const [image,setImage] = useState('');
   const [servingAmount,setServingAmount] = useState('');
 
   const fetchProductData = async () => {
 
-    products.map((item)=>{
+    meals.map((item)=>{
       if (item._id === productId) {
         setProductData(item);
         setImage(item.image[0]);
-        // console.log(item);
         return null;
       }
     })
@@ -26,7 +25,7 @@ const Product = () => {
 
   useEffect(()=> {
     fetchProductData();
-  },[productId, products])
+  },[productId, meals])
 
   return productData ? (
     <div className='pt-10 transition-opacity duration-500 ease-in border-t-2 opacity-100'>
@@ -57,37 +56,30 @@ const Product = () => {
               <p className='pl-2'>(2)</p>
             </div>
             <p className='mt-1 text-sm font-medium'>[{productData.category.join(", ")} | {productData.subCategory.join(", ")}]</p>
-            <p className='mt-5 text-3xl font-medium'>{currency}{productData.price}</p>
             <p className='mt-5 text-gray-500 md:w-4/5'>{productData.description}</p>
+            <p className='mt-2 text-sm text-gray-500'>Prep time: {productData.timeToPrepare} minutes{productData.additionalPrepTime ? ' (plus additional prep time, e.g. marinating/resting)' : ''}</p>
             <div className='flex flex-col gap-1 my-8'>
               <p>Select Amount of Servings:</p>
               <div className='flex gap-2'>
-                {productData.servings.map((item,index)=>(
+                {productData.servingsOptions.map((item,index)=>(
                   <button onClick={()=>setServingAmount(item)} className={`border py-2 px-4 bg-gray-100 ${item === servingAmount ? 'border-orange-500' : ''}`} key={index}>{item}</button>
                 ))}
               </div>
             </div>
-            <button onClick={()=>addToCart(productData._id,servingAmount)} className='px-8 py-3 text-sm text-white bg-black active:bg-gray-700'>ADD TO CART</button>
-            <hr className='mt-8 sm:w-4/5'/>
-            <div className='flex flex-col gap-1 mt-5 text-sm text-gray-500'>
-              <p>100% Original Product.</p> {/* TODO Change to make relevant */}
-              <p>Cash on delivery is available on this product.</p>
-              <p>Easy return and exchange policy within 7 days.</p>
-
-            </div>
+            <button onClick={()=>addToCart(productData._id,servingAmount)} className='px-8 py-3 text-sm text-white bg-black active:bg-gray-700'>ADD TO ORDER</button>
         </div>
       </div>
 
-      {/* ------- Description & Review Section ------- */}
+      {/* ------- Ingredients ------- */}
 
       <div className='mt-20'>
         <div className='flex'>
-          <b className='px-5 py-3 text-sm border'>Description</b>
-          <p className='px-5 py-3 text-sm border'>Reviews (2)</p> {/* TODO Hardcoded review count and no reactive description/reviews button */}
+          <b className='px-5 py-3 text-sm border'>Ingredients (per serving)</b>
         </div>
-        <div className='flex flex-col gap-4 px-6 py-6 text-sm text-gray-500 border'>
-         <p>Dummy Text</p>
-         <p>More dummy text in the description box</p>
+        <div className='flex flex-col gap-2 px-6 py-6 text-sm text-gray-500 border'>
+         {productData.ingredients.map((ingredient, index) => (
+           <p key={index}>{ingredient.quantity} {ingredient.unit} {ingredient.name}</p>
+         ))}
         </div>
       </div>
 

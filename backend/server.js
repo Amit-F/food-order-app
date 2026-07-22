@@ -4,7 +4,7 @@ import 'dotenv/config'
 import connectDB from './config/mongodb.js'
 import connectCloudinary from './config/cloudinary.js'
 import userRouter from './routes/userRoute.js'
-import productRouter from './routes/productRoute.js'
+import mealRouter from './routes/mealRoute.js'
 import householdRouter from './routes/householdRoute.js'
 
 // App Config
@@ -19,7 +19,7 @@ app.use(cors()) // access backend from any ip
 
 // API Endpoints
 app.use('/api/user',userRouter)
-app.use('/api/product',productRouter)
+app.use('/api/meal',mealRouter)
 app.use('/api/household',householdRouter)
 
 
