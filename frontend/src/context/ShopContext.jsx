@@ -2,8 +2,11 @@ import { createContext, useEffect, useState } from "react";
 import { products } from "../assets/assets";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export const ShopContext = createContext();
+
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const ShopContextProvider = (props) => {
 
@@ -12,8 +15,78 @@ const ShopContextProvider = (props) => {
     const [search,setSearch] = useState('');
     const [showSearch, setShowSearch] = useState(false);
     const [cartItems,setCartItems] = useState({});
+    const [token, setToken] = useState(localStorage.getItem('token') || '');
+    const [user, setUser] = useState(() => {
+        const stored = localStorage.getItem('user');
+        return stored ? JSON.parse(stored) : null;
+    });
     const navigate = useNavigate();
     const location = useLocation();
+
+
+    const applySession = (token, user) => {
+        setToken(token);
+        setUser(user);
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+    }
+
+
+    const login = async (email, password) => {
+        try {
+            const response = await axios.post(backendUrl + '/api/user/login', { email, password });
+            if (response.data.success) {
+                applySession(response.data.token, response.data.user);
+                toast.success('Logged in!');
+                navigate('/');
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+
+    const registerCook = async (name, email, password, householdName) => {
+        try {
+            const response = await axios.post(backendUrl + '/api/user/register-cook', { name, email, password, householdName });
+            if (response.data.success) {
+                applySession(response.data.token, response.data.user);
+                toast.success('Account created!');
+                navigate('/');
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+
+    const registerOrderer = async (name, email, password, inviteCode) => {
+        try {
+            const response = await axios.post(backendUrl + '/api/user/register-orderer', { name, email, password, inviteCode });
+            if (response.data.success) {
+                applySession(response.data.token, response.data.user);
+                toast.success('Account created!');
+                navigate('/');
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+
+    const logout = () => {
+        setToken('');
+        setUser(null);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        navigate('/login');
+    }
 
     const addToCart = async (itemId, servingAmount) => {
 
@@ -108,7 +181,14 @@ const ShopContextProvider = (props) => {
         getCartAmount,
         navigate,
         location,
-        navigateAndScroll
+        navigateAndScroll,
+        backendUrl,
+        token,
+        user,
+        login,
+        registerCook,
+        registerOrderer,
+        logout
 
     }
 
