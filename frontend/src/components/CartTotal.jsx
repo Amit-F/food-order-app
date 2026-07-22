@@ -4,30 +4,39 @@ import Title from './Title';
 
 const CartTotal = () => {
 
-    const {currency, delivery_fee, getCartAmount} = useContext(ShopContext);
+    const { cartItems } = useContext(ShopContext);
+
+    let totalMeals = 0;
+    let totalServings = 0;
+
+    for (const mealId in cartItems) {
+        let hasAny = false;
+        for (const servingAmount in cartItems[mealId]) {
+            const quantity = cartItems[mealId][servingAmount];
+            if (quantity > 0) {
+                hasAny = true;
+                totalServings += Number(servingAmount) * quantity;
+            }
+        }
+        if (hasAny) totalMeals += 1;
+    }
 
   return (
     <div className='w-full'>
         <div className='text-2xl'>
-            <Title text1={'CART'} text2={'TOTALS'} />
+            <Title text1={'ORDER'} text2={'SUMMARY'} />
         </div>
 
         <div className='flex flex-col gap-2 mt-2 text-sm'>
             <div className='flex justify-between'>
-                <p>Subtotal</p>
-                <p>{currency} {getCartAmount()}.00</p>
+                <p>Meals</p>
+                <p>{totalMeals}</p>
             </div>
             <hr />
             <div className='flex justify-between'>
-                <p>Shipping & Handling</p>
-                <p>{currency} {getCartAmount() === 0 ? 0 : delivery_fee}.00</p>
+                <b>Total Servings</b>
+                <b>{totalServings}</b>
             </div>
-            <hr />
-            <div className='flex justify-between'>
-                <b>Total</b>
-                <b>{currency} {getCartAmount() === 0 ? 0 : getCartAmount() + delivery_fee}.00</b>
-            </div>
-
         </div>
     </div>
   )

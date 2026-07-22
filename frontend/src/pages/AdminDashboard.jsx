@@ -10,28 +10,38 @@ const STATUS_LABELS = {
   completed: 'Completed'
 };
 
-const Orders = () => {
+const AdminDashboard = () => {
 
-  const {myOrders, fetchMyOrders} = useContext(ShopContext);
+  const {user, householdOrders, fetchHouseholdOrders} = useContext(ShopContext);
 
   useEffect(()=>{
-    fetchMyOrders();
-  },[])
+    if (user?.role === 'cook') {
+      fetchHouseholdOrders();
+    }
+  },[user])
+
+  if (!user) {
+    return <p className='pt-14 text-center'>Please log in as a cook to review orders.</p>
+  }
+
+  if (user.role !== 'cook') {
+    return <p className='pt-14 text-center'>Only the cook can review orders.</p>
+  }
 
   return (
     <div className='pt-16 border-t'>
       <div className='text-2xl'>
-        <Title text1={'MY'} text2={'ORDERS'}/>
+        <Title text1={'ORDER'} text2={'REVIEW'}/>
       </div>
 
       <div>
         {
-          myOrders.length === 0
-          ? <p className='py-8 text-gray-500'>You haven't placed any orders yet.</p>
-          : myOrders.map((order)=>(
+          householdOrders.length === 0
+          ? <p className='py-8 text-gray-500'>No orders yet.</p>
+          : householdOrders.map((order)=>(
             <div key={order._id} className='py-4 text-gray-700 border-t border-b'>
               <div className='flex items-center justify-between mb-2'>
-                <p className='text-sm text-gray-500'>Placed {new Date(order.createdAt).toLocaleDateString()}</p>
+                <p className='font-medium'>{order.ordererId?.name || 'Unknown'} · <span className='text-sm text-gray-500'>{new Date(order.createdAt).toLocaleDateString()}</span></p>
                 <div className='flex items-center gap-2'>
                   <p className='h-2 bg-green-500 rounded-full min-w-2'></p>
                   <p className='text-sm md:text-base'>{STATUS_LABELS[order.status] || order.status}</p>
@@ -55,4 +65,4 @@ const Orders = () => {
   )
 }
 
-export default Orders
+export default AdminDashboard

@@ -6,6 +6,7 @@ import connectCloudinary from './config/cloudinary.js'
 import userRouter from './routes/userRoute.js'
 import mealRouter from './routes/mealRoute.js'
 import householdRouter from './routes/householdRoute.js'
+import orderRouter from './routes/orderRoute.js'
 
 // App Config
 const app = express()
@@ -21,6 +22,7 @@ app.use(cors()) // access backend from any ip
 app.use('/api/user',userRouter)
 app.use('/api/meal',mealRouter)
 app.use('/api/household',householdRouter)
+app.use('/api/order',orderRouter)
 
 
 app.get('/', (req,res)=>{

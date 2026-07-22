@@ -12,6 +12,7 @@ import Invite from './pages/Invite'
 import AddMeal from './pages/AddMeal'
 import PlaceOrder from './pages/PlaceOrder'
 import Orders from './pages/Orders'
+import AdminDashboard from './pages/AdminDashboard'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Searchbar from './components/Searchbar'
@@ -40,6 +41,7 @@ const App = () => {
         <Route path='/add-meal' element={<AddMeal/>} />
         <Route path='/place-order' element={<PlaceOrder/>} />
         <Route path='/orders' element={<Orders/>} />
+        <Route path='/admin/orders' element={<AdminDashboard/>} />
       </Routes>
       <Footer/>
 

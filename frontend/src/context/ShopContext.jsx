@@ -9,8 +9,6 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const ShopContextProvider = (props) => {
 
-    const currency = '₪';
-    const delivery_fee = 10;
     const [search,setSearch] = useState('');
     const [showSearch, setShowSearch] = useState(false);
     const [cartItems,setCartItems] = useState({});
@@ -20,7 +18,8 @@ const ShopContextProvider = (props) => {
         return stored ? JSON.parse(stored) : null;
     });
     const [meals, setMeals] = useState([]);
-    const products = meals; // legacy alias used by pages not yet reworked (Cart/PlaceOrder, milestone 3)
+    const [myOrders, setMyOrders] = useState([]);
+    const [householdOrders, setHouseholdOrders] = useState([]);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -60,11 +59,61 @@ const ShopContextProvider = (props) => {
     }
 
 
+    const fetchMyOrders = async () => {
+        try {
+            const response = await axios.get(backendUrl + '/api/order/mine', authHeader());
+            if (response.data.success) {
+                setMyOrders(response.data.orders);
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+
+    const fetchHouseholdOrders = async () => {
+        try {
+            const response = await axios.get(backendUrl + '/api/order/household', authHeader());
+            if (response.data.success) {
+                setHouseholdOrders(response.data.orders);
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+
+    const submitOrder = async (items) => {
+        try {
+            const response = await axios.post(backendUrl + '/api/order/submit', { items }, authHeader());
+            if (response.data.success) {
+                toast.success('Order submitted!');
+                setCartItems({});
+                await fetchMyOrders();
+                return true;
+            } else {
+                toast.error(response.data.message);
+                return false;
+            }
+        } catch (error) {
+            toast.error(error.message);
+            return false;
+        }
+    }
+
+
     useEffect(() => {
         if (token) {
             fetchMeals();
+            fetchMyOrders();
         } else {
             setMeals([]);
+            setMyOrders([]);
+            setHouseholdOrders([]);
         }
     }, [token])
 
@@ -183,24 +232,6 @@ const ShopContextProvider = (props) => {
     }
 
 
-    const getCartAmount = () => {
-        let totalAmount = 0;
-        for(const item_id in cartItems){
-            let itemInfo = products.find((product)=> product._id === item_id);
-            for(const servingAmount in cartItems[item_id]){
-                try {
-                    let quantity = cartItems[item_id][servingAmount];
-                    if(quantity > 0){                                             
-                        totalAmount += itemInfo.price * servingAmount * quantity; // total amount of all the products in the cart
-                    }
-                } catch (error) {
-                }
-            }
-        }
-        return totalAmount;
-    }
-
-
     const navigateAndScroll = (path) => {
         if (location.pathname === path) {
             window.scrollTo({ top: 0, behavior: 'smooth'});
@@ -212,12 +243,9 @@ const ShopContextProvider = (props) => {
 
 
     const value = {
-        products,
         meals,
         fetchMeals,
         addMeal,
-        currency,
-        delivery_fee,
         search,
         setSearch,
         showSearch,
@@ -226,7 +254,6 @@ const ShopContextProvider = (props) => {
         addToCart,
         getCartCount,
         updateQuantity,
-        getCartAmount,
         navigate,
         location,
         navigateAndScroll,
@@ -236,7 +263,12 @@ const ShopContextProvider = (props) => {
         login,
         registerCook,
         registerOrderer,
-        logout
+        logout,
+        myOrders,
+        fetchMyOrders,
+        householdOrders,
+        fetchHouseholdOrders,
+        submitOrder
 
     }
 
