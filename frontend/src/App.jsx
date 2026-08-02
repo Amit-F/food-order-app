@@ -10,6 +10,7 @@ import Login from './pages/Login'
 import JoinHousehold from './pages/JoinHousehold'
 import Invite from './pages/Invite'
 import AddMeal from './pages/AddMeal'
+import EditMeal from './pages/EditMeal'
 import PlaceOrder from './pages/PlaceOrder'
 import Orders from './pages/Orders'
 import AdminDashboard from './pages/AdminDashboard'
@@ -40,6 +41,7 @@ const App = () => {
         <Route path='/join/:code' element={<JoinHousehold/>} />
         <Route path='/invite' element={<Invite/>} />
         <Route path='/add-meal' element={<AddMeal/>} />
+        <Route path='/edit-meal/:mealId' element={<EditMeal/>} />
         <Route path='/place-order' element={<PlaceOrder/>} />
         <Route path='/orders' element={<Orders/>} />
         <Route path='/admin/orders' element={<AdminDashboard/>} />

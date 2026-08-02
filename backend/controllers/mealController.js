@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary"
 import mealModel from "../models/mealModel.js"
+import prepareImageForUpload from "../utils/prepareImageForUpload.js"
 
 
 // Add Meal Function (cook-only)
@@ -19,7 +20,8 @@ const addMeal = async (req, res) => {
 
         const imageUrls = await Promise.all(
             imageFiles.map(async (file) => {
-                const result = await cloudinary.uploader.upload(file.path, { resource_type: "image" })
+                const uploadPath = await prepareImageForUpload(file.path)
+                const result = await cloudinary.uploader.upload(uploadPath, { resource_type: "image" })
                 return result.secure_url
             })
         )
@@ -38,6 +40,63 @@ const addMeal = async (req, res) => {
             ingredients: JSON.parse(ingredients),
             bestSeller: bestSeller === "true" || bestSeller === true
         })
+
+        await meal.save()
+
+        res.json({ success: true, meal })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+
+}
+
+
+// Update Meal Function (cook-only). Existing images the cook didn't replace are
+// passed back as `existingImages`; any new image1..image5 files are uploaded and
+// appended, so editing (e.g. adding ingredients) never requires re-uploading photos.
+const updateMeal = async (req, res) => {
+
+    try {
+
+        const { id, name, description, timeToPrepare, additionalPrepTime, category, subCategory, servingsOptions, ingredients, bestSeller, existingImages } = req.body
+
+        const meal = await mealModel.findOne({ _id: id, householdId: req.user.householdId })
+
+        if (!meal) {
+            return res.json({ success: false, message: "Meal not found" })
+        }
+
+        const imageFiles = [1, 2, 3, 4, 5]
+            .map((n) => req.files?.[`image${n}`]?.[0])
+            .filter((file) => file)
+
+        const newImageUrls = await Promise.all(
+            imageFiles.map(async (file) => {
+                const uploadPath = await prepareImageForUpload(file.path)
+                const result = await cloudinary.uploader.upload(uploadPath, { resource_type: "image" })
+                return result.secure_url
+            })
+        )
+
+        const keptImages = existingImages ? JSON.parse(existingImages) : []
+        const finalImages = [...keptImages, ...newImageUrls]
+
+        if (finalImages.length === 0) {
+            return res.json({ success: false, message: "At least one image is required" })
+        }
+
+        meal.name = name
+        meal.description = description
+        meal.timeToPrepare = Number(timeToPrepare)
+        meal.additionalPrepTime = additionalPrepTime === "true" || additionalPrepTime === true
+        meal.category = JSON.parse(category)
+        meal.subCategory = JSON.parse(subCategory)
+        meal.servingsOptions = JSON.parse(servingsOptions)
+        meal.ingredients = JSON.parse(ingredients)
+        meal.bestSeller = bestSeller === "true" || bestSeller === true
+        meal.image = finalImages
 
         await meal.save()
 
@@ -116,4 +175,4 @@ const listMeals = async (req, res) => {
 }
 
 
-export { addMeal, removeMeal, singleMeal, listMeals }
+export { addMeal, updateMeal, removeMeal, singleMeal, listMeals }

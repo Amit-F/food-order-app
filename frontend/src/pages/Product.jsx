@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { ShopContext } from '../context/ShopContext';
 import { assets } from '../assets/assets';
 import RelatedProducts from '../components/RelatedProducts';
@@ -7,7 +7,7 @@ import RelatedProducts from '../components/RelatedProducts';
 const Product = () => {
 
   const {productId} = useParams();
-  const {meals, addToCart} = useContext(ShopContext);
+  const {meals, addToCart, user} = useContext(ShopContext);
   const [productData,setProductData] = useState(false);
   const [image,setImage] = useState('');
   const [servingAmount,setServingAmount] = useState('');
@@ -46,7 +46,10 @@ const Product = () => {
         </div>
         {/* ------- Product Information ------- */}
         <div className='flex-1'>
-            <h1 className='mt-2 text-2xl font-medium'>{productData.name}</h1>
+            <div className='flex items-center justify-between'>
+              <h1 className='mt-2 text-2xl font-medium'>{productData.name}</h1>
+              {user?.role === 'cook' && <Link to={`/edit-meal/${productData._id}`} className='text-sm underline'>Edit Meal</Link>}
+            </div>
             <div className='flex items-center gap-1 mt-2'>
               <img src={assets.star_icon} alt="" className="w-3 5" />
               <img src={assets.star_icon} alt="" className="w-3 5" />
@@ -77,9 +80,12 @@ const Product = () => {
           <b className='px-5 py-3 text-sm border'>Ingredients (per serving)</b>
         </div>
         <div className='flex flex-col gap-2 px-6 py-6 text-sm text-gray-500 border'>
-         {productData.ingredients.map((ingredient, index) => (
-           <p key={index}>{ingredient.quantity} {ingredient.unit} {ingredient.name}</p>
-         ))}
+         {productData.ingredients.length === 0
+           ? <p className='italic'>No ingredients added yet{user?.role === 'cook' && <> — <Link to={`/edit-meal/${productData._id}`} className='underline'>add some</Link></>}.</p>
+           : productData.ingredients.map((ingredient, index) => (
+             <p key={index}>{ingredient.quantity} {ingredient.unit} {ingredient.name}</p>
+           ))
+         }
         </div>
       </div>
 

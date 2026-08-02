@@ -59,6 +59,25 @@ const ShopContextProvider = (props) => {
     }
 
 
+    const updateMeal = async (id, formData) => {
+        try {
+            formData.append('id', id);
+            const response = await axios.post(backendUrl + '/api/meal/update', formData, authHeader());
+            if (response.data.success) {
+                toast.success('Meal updated!');
+                await fetchMeals();
+                return true;
+            } else {
+                toast.error(response.data.message);
+                return false;
+            }
+        } catch (error) {
+            toast.error(error.message);
+            return false;
+        }
+    }
+
+
     const fetchMyOrders = async () => {
         try {
             const response = await axios.get(backendUrl + '/api/order/mine', authHeader());
@@ -246,6 +265,7 @@ const ShopContextProvider = (props) => {
         meals,
         fetchMeals,
         addMeal,
+        updateMeal,
         search,
         setSearch,
         showSearch,
