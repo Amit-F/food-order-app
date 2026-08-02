@@ -13,6 +13,7 @@ import AddMeal from './pages/AddMeal'
 import PlaceOrder from './pages/PlaceOrder'
 import Orders from './pages/Orders'
 import AdminDashboard from './pages/AdminDashboard'
+import ShoppingList from './pages/ShoppingList'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Searchbar from './components/Searchbar'
@@ -42,6 +43,7 @@ const App = () => {
         <Route path='/place-order' element={<PlaceOrder/>} />
         <Route path='/orders' element={<Orders/>} />
         <Route path='/admin/orders' element={<AdminDashboard/>} />
+        <Route path='/shopping-list' element={<ShoppingList/>} />
       </Routes>
       <Footer/>
 

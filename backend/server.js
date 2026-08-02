@@ -7,6 +7,7 @@ import userRouter from './routes/userRoute.js'
 import mealRouter from './routes/mealRoute.js'
 import householdRouter from './routes/householdRoute.js'
 import orderRouter from './routes/orderRoute.js'
+import shoppingListRouter from './routes/shoppingListRoute.js'
 
 // App Config
 const app = express()
@@ -23,6 +24,7 @@ app.use('/api/user',userRouter)
 app.use('/api/meal',mealRouter)
 app.use('/api/household',householdRouter)
 app.use('/api/order',orderRouter)
+app.use('/api/shopping-list',shoppingListRouter)
 
 
 app.get('/', (req,res)=>{

@@ -54,6 +54,7 @@ const Navbar = () => {
                             <p onClick={()=>navigate('/orders')} className='cursor-pointer hover:text-black'>Orders</p>
                             {user.role === 'cook' && <p onClick={()=>navigate('/add-meal')} className='cursor-pointer hover:text-black'>Add Meal</p>}
                             {user.role === 'cook' && <p onClick={()=>navigate('/admin/orders')} className='cursor-pointer hover:text-black'>Review Orders</p>}
+                            {user.role === 'cook' && <p onClick={()=>navigate('/shopping-list')} className='cursor-pointer hover:text-black'>Shopping List</p>}
                             {user.role === 'cook' && <p onClick={()=>navigate('/invite')} className='cursor-pointer hover:text-black'>Invite</p>}
                             <p onClick={logout} className='cursor-pointer hover:text-black'>Logout</p>
                         </>
