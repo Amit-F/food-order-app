@@ -140,7 +140,9 @@ const ShopContextProvider = (props) => {
             const response = await axios.post(backendUrl + endpoint, payload, authHeader());
             if (response.data.success) {
                 if (successMessage) toast.success(successMessage);
-                await fetchHouseholdOrders();
+                // Cancel is reachable by either role; the other three actions are cook-only,
+                // so this branch is a no-op behavior change for them (user.role === 'cook' there already).
+                await (user?.role === 'cook' ? fetchHouseholdOrders() : fetchMyOrders());
                 return true;
             } else {
                 toast.error(response.data.message);
@@ -156,6 +158,7 @@ const ShopContextProvider = (props) => {
     const markShoppingDone = (orderId) => runOrderAction('/api/order/mark-shopping-done', { orderId }, 'Marked as shopped!');
     const scheduleCooking = (orderId, date, time) => runOrderAction('/api/order/schedule-cooking', { orderId, date, time }, 'Cooking scheduled!');
     const markCookingDone = (orderId) => runOrderAction('/api/order/mark-cooking-done', { orderId }, 'Order completed!');
+    const cancelOrder = (orderId) => runOrderAction('/api/order/cancel', { orderId }, 'Order cancelled.');
 
 
     const submitOrder = async (items) => {
@@ -353,7 +356,8 @@ const ShopContextProvider = (props) => {
         scheduleShopping,
         markShoppingDone,
         scheduleCooking,
-        markCookingDone
+        markCookingDone,
+        cancelOrder
 
     }
 

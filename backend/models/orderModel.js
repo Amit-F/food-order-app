@@ -10,9 +10,11 @@ const orderSchema = new mongoose.Schema({
     }],
     status: {
         type: String,
-        enum: ['pending', 'shopping_scheduled', 'shopping_done', 'cook_scheduled', 'completed'],
+        enum: ['pending', 'shopping_scheduled', 'shopping_done', 'cook_scheduled', 'completed', 'cancelled'],
         default: 'pending'
     },
+    cancelledAt: { type: Date },
+    cancelledBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
     weekOf: { type: Date },
     shoppingCalendar: {
         eventId: { type: String },

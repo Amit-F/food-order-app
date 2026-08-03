@@ -269,4 +269,42 @@ const markCookingDone = async (req, res) => {
 }
 
 
-export { submitOrder, listOrdersForHousehold, getMyOrders, scheduleShopping, markShoppingDone, scheduleCooking, markCookingDone }
+// Route: orderer cancels their own order, or the cook cancels any order in the
+// household — only while still 'pending'. Cancellation only ever happens before
+// scheduleShopping has created a calendar event, so there's never a dangling
+// Google Calendar event to clean up here; if a later change ever allows
+// cancelling a shopping_scheduled/cook_scheduled order, that invariant breaks
+// and the corresponding calendar event would need to be deleted too.
+const cancelOrder = async (req, res) => {
+
+    try {
+
+        const { orderId } = req.body
+        const order = await orderModel.findOne({ _id: orderId, householdId: req.user.householdId })
+
+        if (!order) {
+            return res.json({ success: false, message: "Order not found" })
+        }
+        if (order.status !== 'pending') {
+            return res.json({ success: false, message: "Only orders still waiting for shopping to be scheduled can be cancelled" })
+        }
+        if (req.user.role !== 'cook' && order.ordererId.toString() !== req.user.id) {
+            return res.json({ success: false, message: "You can only cancel your own orders" })
+        }
+
+        order.status = 'cancelled'
+        order.cancelledAt = new Date()
+        order.cancelledBy = req.user.id
+        await order.save()
+
+        res.json({ success: true, order })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+
+}
+
+
+export { submitOrder, listOrdersForHousehold, getMyOrders, scheduleShopping, markShoppingDone, scheduleCooking, markCookingDone, cancelOrder }

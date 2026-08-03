@@ -7,7 +7,8 @@ const STATUS_LABELS = {
   shopping_scheduled: 'Shopping scheduled',
   shopping_done: 'Shopping done',
   cook_scheduled: 'Cooking scheduled',
-  completed: 'Completed'
+  completed: 'Completed',
+  cancelled: 'Cancelled'
 };
 
 const AdminDashboard = () => {
@@ -15,7 +16,7 @@ const AdminDashboard = () => {
   const {
     user, householdOrders, fetchHouseholdOrders,
     calendarConnected, connectCalendar,
-    scheduleShopping, markShoppingDone, scheduleCooking, markCookingDone
+    scheduleShopping, markShoppingDone, scheduleCooking, markCookingDone, cancelOrder
   } = useContext(ShopContext);
 
   const [openSchedule, setOpenSchedule] = useState(null); // { orderId, type: 'shopping' | 'cooking' } | null
@@ -76,7 +77,7 @@ const AdminDashboard = () => {
               <div className='flex items-center justify-between mb-2'>
                 <p className='font-medium'>{order.ordererId?.name || 'Unknown'} · <span className='text-sm text-gray-500'>{new Date(order.createdAt).toLocaleDateString()}</span></p>
                 <div className='flex items-center gap-2'>
-                  <p className='h-2 bg-green-500 rounded-full min-w-2'></p>
+                  <p className={`h-2 rounded-full min-w-2 ${order.status === 'cancelled' ? 'bg-gray-400' : 'bg-green-500'}`}></p>
                   <p className='text-sm md:text-base'>{STATUS_LABELS[order.status] || order.status}</p>
                 </div>
               </div>
@@ -94,7 +95,10 @@ const AdminDashboard = () => {
               {/* Scheduling actions */}
               <div className='mt-3'>
                 {order.status === 'pending' && openSchedule?.orderId !== order._id && (
-                  <button disabled={!calendarConnected} onClick={()=>startScheduling(order._id, 'shopping')} className='px-4 py-2 text-sm text-white bg-black disabled:opacity-40'>Schedule Shopping</button>
+                  <div className='flex items-center gap-3'>
+                    <button disabled={!calendarConnected} onClick={()=>startScheduling(order._id, 'shopping')} className='px-4 py-2 text-sm text-white bg-black disabled:opacity-40'>Schedule Shopping</button>
+                    <button onClick={()=>cancelOrder(order._id)} className='px-4 py-2 text-sm border border-gray-400 hover:border-black'>Cancel Order</button>
+                  </div>
                 )}
 
                 {order.status === 'shopping_scheduled' && (
