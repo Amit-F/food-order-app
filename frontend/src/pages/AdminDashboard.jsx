@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { ShopContext } from '../context/ShopContext'
 import Title from '../components/Title';
 
@@ -12,7 +12,16 @@ const STATUS_LABELS = {
 
 const AdminDashboard = () => {
 
-  const {user, householdOrders, fetchHouseholdOrders} = useContext(ShopContext);
+  const {
+    user, householdOrders, fetchHouseholdOrders,
+    calendarConnected, connectCalendar,
+    scheduleShopping, markShoppingDone, scheduleCooking, markCookingDone
+  } = useContext(ShopContext);
+
+  const [openSchedule, setOpenSchedule] = useState(null); // { orderId, type: 'shopping' | 'cooking' } | null
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(()=>{
     if (user?.role === 'cook') {
@@ -28,11 +37,35 @@ const AdminDashboard = () => {
     return <p className='pt-14 text-center'>Only the cook can review orders.</p>
   }
 
+  const startScheduling = (orderId, type) => {
+    setOpenSchedule({ orderId, type });
+    setDate('');
+    setTime('');
+  }
+
+  const cancelScheduling = () => setOpenSchedule(null);
+
+  const confirmScheduling = async () => {
+    if (!date || !time) return;
+    setSubmitting(true);
+    const action = openSchedule.type === 'shopping' ? scheduleShopping : scheduleCooking;
+    const success = await action(openSchedule.orderId, date, time);
+    setSubmitting(false);
+    if (success) setOpenSchedule(null);
+  }
+
   return (
     <div className='pt-16 border-t'>
       <div className='text-2xl'>
         <Title text1={'ORDER'} text2={'REVIEW'}/>
       </div>
+
+      {!calendarConnected && (
+        <div className='flex items-center justify-between p-4 mt-4 bg-gray-100'>
+          <p className='text-sm'>Connect Google Calendar to schedule shopping and cooking events.</p>
+          <button onClick={connectCalendar} className='px-4 py-2 text-sm text-white bg-black whitespace-nowrap'>Connect Google Calendar</button>
+        </div>
+      )}
 
       <div>
         {
@@ -56,6 +89,40 @@ const AdminDashboard = () => {
                     {item.notes && <p className='italic text-gray-400'>"{item.notes}"</p>}
                   </div>
                 ))}
+              </div>
+
+              {/* Scheduling actions */}
+              <div className='mt-3'>
+                {order.status === 'pending' && openSchedule?.orderId !== order._id && (
+                  <button disabled={!calendarConnected} onClick={()=>startScheduling(order._id, 'shopping')} className='px-4 py-2 text-sm text-white bg-black disabled:opacity-40'>Schedule Shopping</button>
+                )}
+
+                {order.status === 'shopping_scheduled' && (
+                  <div className='flex items-center gap-3'>
+                    <p className='text-sm text-gray-500'>Shopping: {order.shoppingCalendar?.scheduledFor ? new Date(order.shoppingCalendar.scheduledFor).toLocaleString() : ''}</p>
+                    <button onClick={()=>markShoppingDone(order._id)} className='px-4 py-2 text-sm text-white bg-black'>Mark Shopping Done</button>
+                  </div>
+                )}
+
+                {order.status === 'shopping_done' && openSchedule?.orderId !== order._id && (
+                  <button disabled={!calendarConnected} onClick={()=>startScheduling(order._id, 'cooking')} className='px-4 py-2 text-sm text-white bg-black disabled:opacity-40'>Schedule Cooking</button>
+                )}
+
+                {order.status === 'cook_scheduled' && (
+                  <div className='flex items-center gap-3'>
+                    <p className='text-sm text-gray-500'>Cooking: {order.cookCalendar?.scheduledFor ? new Date(order.cookCalendar.scheduledFor).toLocaleString() : ''}</p>
+                    <button onClick={()=>markCookingDone(order._id)} className='px-4 py-2 text-sm text-white bg-black'>Mark Cooking Done</button>
+                  </div>
+                )}
+
+                {openSchedule?.orderId === order._id && (
+                  <div className='flex flex-wrap items-center gap-2 mt-2'>
+                    <input type="date" value={date} onChange={(e)=>setDate(e.target.value)} className='px-2 py-1 border border-gray-300' />
+                    <input type="time" value={time} onChange={(e)=>setTime(e.target.value)} className='px-2 py-1 border border-gray-300' />
+                    <button disabled={submitting || !date || !time} onClick={confirmScheduling} className='px-4 py-1 text-sm text-white bg-black disabled:opacity-40'>{submitting ? 'Scheduling...' : 'Confirm'}</button>
+                    <button onClick={cancelScheduling} className='px-4 py-1 text-sm border'>Cancel</button>
+                  </div>
+                )}
               </div>
             </div>
           ))

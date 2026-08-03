@@ -20,6 +20,7 @@ const ShopContextProvider = (props) => {
     const [meals, setMeals] = useState([]);
     const [myOrders, setMyOrders] = useState([]);
     const [householdOrders, setHouseholdOrders] = useState([]);
+    const [calendarConnected, setCalendarConnected] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -106,6 +107,55 @@ const ShopContextProvider = (props) => {
     }
 
 
+    const fetchCalendarStatus = async () => {
+        try {
+            const response = await axios.get(backendUrl + '/api/calendar/status', authHeader());
+            if (response.data.success) {
+                setCalendarConnected(response.data.connected);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+
+    const connectCalendar = async () => {
+        try {
+            const response = await axios.get(backendUrl + '/api/calendar/connect', authHeader());
+            if (response.data.success) {
+                window.location.href = response.data.url; // hand off to Google's real consent screen
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+
+    const runOrderAction = async (endpoint, payload, successMessage) => {
+        try {
+            const response = await axios.post(backendUrl + endpoint, payload, authHeader());
+            if (response.data.success) {
+                if (successMessage) toast.success(successMessage);
+                await fetchHouseholdOrders();
+                return true;
+            } else {
+                toast.error(response.data.message);
+                return false;
+            }
+        } catch (error) {
+            toast.error(error.message);
+            return false;
+        }
+    }
+
+    const scheduleShopping = (orderId, date, time) => runOrderAction('/api/order/schedule-shopping', { orderId, date, time }, 'Shopping scheduled!');
+    const markShoppingDone = (orderId) => runOrderAction('/api/order/mark-shopping-done', { orderId }, 'Marked as shopped!');
+    const scheduleCooking = (orderId, date, time) => runOrderAction('/api/order/schedule-cooking', { orderId, date, time }, 'Cooking scheduled!');
+    const markCookingDone = (orderId) => runOrderAction('/api/order/mark-cooking-done', { orderId }, 'Order completed!');
+
+
     const submitOrder = async (items) => {
         try {
             const response = await axios.post(backendUrl + '/api/order/submit', { items }, authHeader());
@@ -129,10 +179,14 @@ const ShopContextProvider = (props) => {
         if (token) {
             fetchMeals();
             fetchMyOrders();
+            if (user?.role === 'cook') {
+                fetchCalendarStatus();
+            }
         } else {
             setMeals([]);
             setMyOrders([]);
             setHouseholdOrders([]);
+            setCalendarConnected(false);
         }
     }, [token])
 
@@ -288,7 +342,14 @@ const ShopContextProvider = (props) => {
         fetchMyOrders,
         householdOrders,
         fetchHouseholdOrders,
-        submitOrder
+        submitOrder,
+        calendarConnected,
+        fetchCalendarStatus,
+        connectCalendar,
+        scheduleShopping,
+        markShoppingDone,
+        scheduleCooking,
+        markCookingDone
 
     }
 

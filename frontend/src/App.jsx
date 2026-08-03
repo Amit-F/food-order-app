@@ -15,6 +15,7 @@ import PlaceOrder from './pages/PlaceOrder'
 import Orders from './pages/Orders'
 import AdminDashboard from './pages/AdminDashboard'
 import ShoppingList from './pages/ShoppingList'
+import CalendarConnected from './pages/CalendarConnected'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Searchbar from './components/Searchbar'
@@ -46,6 +47,7 @@ const App = () => {
         <Route path='/orders' element={<Orders/>} />
         <Route path='/admin/orders' element={<AdminDashboard/>} />
         <Route path='/shopping-list' element={<ShoppingList/>} />
+        <Route path='/calendar-connected' element={<CalendarConnected/>} />
       </Routes>
       <Footer/>
 
