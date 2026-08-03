@@ -1,6 +1,21 @@
 import { v2 as cloudinary } from "cloudinary"
+import fs from "fs"
 import mealModel from "../models/mealModel.js"
 import prepareImageForUpload from "../utils/prepareImageForUpload.js"
+
+// multer writes uploaded files to the OS temp dir with no cleanup of its own,
+// and prepareImageForUpload may add a second resized temp copy — both need to
+// be removed once Cloudinary has the image, or every upload leaks disk space.
+const uploadAndCleanup = async (file) => {
+    const uploadPath = await prepareImageForUpload(file.path)
+    try {
+        const result = await cloudinary.uploader.upload(uploadPath, { resource_type: "image" })
+        return result.secure_url
+    } finally {
+        fs.unlink(file.path, () => {})
+        if (uploadPath !== file.path) fs.unlink(uploadPath, () => {})
+    }
+}
 
 
 // Add Meal Function (cook-only)
@@ -18,13 +33,7 @@ const addMeal = async (req, res) => {
             return res.json({ success: false, message: "At least one image is required" })
         }
 
-        const imageUrls = await Promise.all(
-            imageFiles.map(async (file) => {
-                const uploadPath = await prepareImageForUpload(file.path)
-                const result = await cloudinary.uploader.upload(uploadPath, { resource_type: "image" })
-                return result.secure_url
-            })
-        )
+        const imageUrls = await Promise.all(imageFiles.map(uploadAndCleanup))
 
         const meal = new mealModel({
             householdId: req.user.householdId,
@@ -72,13 +81,7 @@ const updateMeal = async (req, res) => {
             .map((n) => req.files?.[`image${n}`]?.[0])
             .filter((file) => file)
 
-        const newImageUrls = await Promise.all(
-            imageFiles.map(async (file) => {
-                const uploadPath = await prepareImageForUpload(file.path)
-                const result = await cloudinary.uploader.upload(uploadPath, { resource_type: "image" })
-                return result.secure_url
-            })
-        )
+        const newImageUrls = await Promise.all(imageFiles.map(uploadAndCleanup))
 
         const keptImages = existingImages ? JSON.parse(existingImages) : []
         const finalImages = [...keptImages, ...newImageUrls]

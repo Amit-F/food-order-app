@@ -93,7 +93,7 @@ const Product = () => {
       <RelatedProducts category={productData.category} subCategory={productData.subCategory} _id={productData._id}/>
 
     </div>
-  ) : <div className='opacity-0'></div>
+  ) : (meals.length > 0 ? <p className='pt-14 text-center text-gray-500'>Meal not found.</p> : <div className='opacity-0'></div>)
 }
 
 export default Product

@@ -127,13 +127,17 @@ const Collection = () => {
         </div>
 
         {/* Map Meals */}
-        <div className='grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 gap-y-6'>
-          {
-            filteredMeals.map((item)=>(
-              <ProductItem key={item._id} name={item.name} id={item._id} image={item.image} />
-            ))
-          }
-        </div>
+        {
+          filteredMeals.length === 0
+          ? <p className='py-8 text-gray-500'>{meals.length === 0 ? 'No meals added yet.' : 'No meals match your filters.'}</p>
+          : <div className='grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 gap-y-6'>
+            {
+              filteredMeals.map((item)=>(
+                <ProductItem key={item._id} name={item.name} id={item._id} image={item.image} />
+              ))
+            }
+          </div>
+        }
       </div>
     </div>
   )

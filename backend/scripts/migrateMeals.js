@@ -10,6 +10,7 @@
 // household, so a failed/interrupted run is safe to just run again.
 
 import 'dotenv/config'
+import fs from 'fs'
 import mongoose from 'mongoose'
 import { v2 as cloudinary } from 'cloudinary'
 import mealModel from '../models/mealModel.js'
@@ -64,8 +65,11 @@ async function main() {
 
         const imageUrls = []
         for (const imgPath of product.image) {
+            // imgPath is a permanent file in frontend/src/assets — never delete it.
+            // Only prepareImageForUpload's resized temp copy (a different path) gets cleaned up.
             const uploadPath = await prepareImageForUpload(imgPath)
             const result = await cloudinary.uploader.upload(uploadPath, { resource_type: 'image' })
+            if (uploadPath !== imgPath) fs.unlink(uploadPath, () => {})
             imageUrls.push(result.secure_url)
         }
 
