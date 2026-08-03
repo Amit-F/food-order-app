@@ -13,7 +13,7 @@ const STATUS_LABELS = {
 
 const Orders = () => {
 
-  const {myOrders, fetchMyOrders, cancelOrder} = useContext(ShopContext);
+  const {myOrders, fetchMyOrders, cancelOrder, reorder} = useContext(ShopContext);
 
   useEffect(()=>{
     fetchMyOrders();
@@ -51,6 +51,11 @@ const Orders = () => {
               {order.status === 'pending' && (
                 <div className='mt-3'>
                   <button onClick={()=>cancelOrder(order._id)} className='px-4 py-1 text-sm border border-gray-400 hover:border-black'>Cancel Order</button>
+                </div>
+              )}
+              {order.status === 'completed' && (
+                <div className='mt-3'>
+                  <button onClick={()=>reorder(order)} className='px-4 py-1 text-sm border border-gray-400 hover:border-black'>Order Again</button>
                 </div>
               )}
             </div>

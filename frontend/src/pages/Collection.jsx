@@ -6,12 +6,13 @@ import ProductItem from '../components/ProductItem';
 
 const Collection = () => {
 
-  const { meals, search, showSearch } = useContext(ShopContext);
+  const { meals, search, showSearch, user, favoriteMealIds } = useContext(ShopContext);
 
   const [showFilter, setShowFilter] = useState(true);
 
   const [category, setCategory] = useState([]);
   const [subCategory, setSubcategory] = useState([]);
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
 
   const toggleCategory = (e) => {
     const value = e.target.value;
@@ -45,9 +46,14 @@ const Collection = () => {
       list = list.filter((item) => item.subCategory?.some((sub) => subCategory.includes(sub)));
     }
 
+    // Favorites-only filter
+    if (favoritesOnly) {
+      list = list.filter((item) => favoriteMealIds.includes(item._id));
+    }
+
     return list;
 
-  },[meals, search, showSearch, category, subCategory])
+  },[meals, search, showSearch, category, subCategory, favoritesOnly, favoriteMealIds])
 
 
   return (
@@ -116,7 +122,16 @@ const Collection = () => {
               <input className='w-3' type="checkbox" value={'Salad'} onChange={toggleSubCategory} /> Salad
             </p>
           </div>
-        </div>        
+        </div>
+
+        {/* Favorites Filter */}
+        {user && (
+          <div className={`border border-gray-300 pl-5 py-3 my-5 ${showFilter ? '' : 'hidden'} sm:block`}>
+            <label className='flex gap-2 text-sm font-light text-gray-700'>
+              <input className='w-3' type="checkbox" checked={favoritesOnly} onChange={(e)=>setFavoritesOnly(e.target.checked)} /> Favorites only
+            </label>
+          </div>
+        )}
       </div>
 
       {/* Right Side */}

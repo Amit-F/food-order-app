@@ -22,6 +22,7 @@ const ShopContextProvider = (props) => {
     const [myOrders, setMyOrders] = useState([]);
     const [householdOrders, setHouseholdOrders] = useState([]);
     const [calendarConnected, setCalendarConnected] = useState(false);
+    const [favoriteMealIds, setFavoriteMealIds] = useState(() => user?.favoriteMealIds || []);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -200,6 +201,7 @@ const ShopContextProvider = (props) => {
     const applySession = (token, user) => {
         setToken(token);
         setUser(user);
+        setFavoriteMealIds(user.favoriteMealIds || []);
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
     }
@@ -256,9 +258,50 @@ const ShopContextProvider = (props) => {
     const logout = () => {
         setToken('');
         setUser(null);
+        setFavoriteMealIds([]);
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         navigate('/login');
+    }
+
+
+    const toggleFavorite = async (mealId) => {
+        try {
+            const response = await axios.post(backendUrl + '/api/user/favorite/toggle', { mealId }, authHeader());
+            if (response.data.success) {
+                setFavoriteMealIds(response.data.favoriteMealIds);
+                // Keep localStorage's cached user object in sync too — favoriteMealIds is
+                // seeded from it on every fresh page load, so without this a refresh right
+                // after toggling would show stale (reverted) favorite status until next login.
+                const storedUser = JSON.parse(localStorage.getItem('user'));
+                storedUser.favoriteMealIds = response.data.favoriteMealIds;
+                localStorage.setItem('user', JSON.stringify(storedUser));
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+
+    const reorder = (order) => {
+        const addable = order.items.filter((item) => item.mealId);
+        if (addable.length === 0) {
+            toast.error('Nothing in this order is still available');
+            return;
+        }
+        setCartItems((prev) => {
+            const next = structuredClone(prev);
+            addable.forEach((item) => {
+                const id = item.mealId._id || item.mealId;
+                next[id] = next[id] || {};
+                next[id][item.servings] = (next[id][item.servings] || 0) + 1;
+            });
+            return next;
+        });
+        toast.success('Added to your order draft!');
+        navigate('/cart');
     }
 
     const addToCart = async (itemId, servingAmount) => {
@@ -357,7 +400,10 @@ const ShopContextProvider = (props) => {
         markShoppingDone,
         scheduleCooking,
         markCookingDone,
-        cancelOrder
+        cancelOrder,
+        favoriteMealIds,
+        toggleFavorite,
+        reorder
 
     }
 

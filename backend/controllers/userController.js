@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken"
 import userModel from "../models/userModel.js";
 import householdModel from "../models/householdModel.js";
 import inviteModel from "../models/inviteModel.js";
+import mealModel from "../models/mealModel.js";
 
 
 const createToken = (user) => {
@@ -15,7 +16,8 @@ const userResponse = (user) => ({
     name: user.name,
     email: user.email,
     role: user.role,
-    householdId: user.householdId
+    householdId: user.householdId,
+    favoriteMealIds: user.favoriteMealIds || []
 })
 
 
@@ -173,4 +175,37 @@ const loginUser = async (req, res) => {
 }
 
 
-export { registerCook, registerOrderer, loginUser }
+// Route for toggling a meal as a favorite (either role)
+const toggleFavorite = async (req, res) => {
+
+    try {
+
+        const { mealId } = req.body
+
+        const meal = await mealModel.findOne({ _id: mealId, householdId: req.user.householdId })
+        if (!meal) {
+            return res.json({ success: false, message: "Meal not found" })
+        }
+
+        const user = await userModel.findById(req.user.id)
+        const index = user.favoriteMealIds.findIndex((id) => id.toString() === mealId)
+
+        if (index >= 0) {
+            user.favoriteMealIds.splice(index, 1)
+        } else {
+            user.favoriteMealIds.push(mealId)
+        }
+
+        await user.save()
+
+        res.json({ success: true, favoriteMealIds: user.favoriteMealIds })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+
+}
+
+
+export { registerCook, registerOrderer, loginUser, toggleFavorite }

@@ -7,7 +7,7 @@ import RelatedProducts from '../components/RelatedProducts';
 const Product = () => {
 
   const {productId} = useParams();
-  const {meals, mealsLoaded, addToCart, user} = useContext(ShopContext);
+  const {meals, mealsLoaded, addToCart, user, favoriteMealIds, toggleFavorite} = useContext(ShopContext);
   const [productData,setProductData] = useState(false);
   const [image,setImage] = useState('');
   const [servingAmount,setServingAmount] = useState('');
@@ -48,7 +48,18 @@ const Product = () => {
         <div className='flex-1'>
             <div className='flex items-center justify-between'>
               <h1 className='mt-2 text-2xl font-medium'>{productData.name}</h1>
-              {user?.role === 'cook' && <Link to={`/edit-meal/${productData._id}`} className='text-sm underline'>Edit Meal</Link>}
+              <div className='flex items-center gap-4'>
+                {user && (
+                  <button
+                    onClick={()=>toggleFavorite(productData._id)}
+                    className='text-2xl leading-none text-red-500'
+                    aria-label={favoriteMealIds.includes(productData._id) ? 'Remove from favorites' : 'Add to favorites'}
+                  >
+                    {favoriteMealIds.includes(productData._id) ? '♥' : '♡'}
+                  </button>
+                )}
+                {user?.role === 'cook' && <Link to={`/edit-meal/${productData._id}`} className='text-sm underline'>Edit Meal</Link>}
+              </div>
             </div>
             <div className='flex items-center gap-1 mt-2'>
               <img src={assets.star_icon} alt="" className="w-3 5" />

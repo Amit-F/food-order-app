@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     role: { type: String, enum: ['cook', 'orderer'], required: true },
     householdId: { type: mongoose.Schema.Types.ObjectId, ref: "household", required: true },
+    favoriteMealIds: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: "meal" }], default: [] },
     google: {
         connected: { type: Boolean, default: false },
         refreshToken: { type: String, select: false },
