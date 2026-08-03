@@ -18,6 +18,7 @@ const ShopContextProvider = (props) => {
         return stored ? JSON.parse(stored) : null;
     });
     const [meals, setMeals] = useState([]);
+    const [mealsLoaded, setMealsLoaded] = useState(false);
     const [myOrders, setMyOrders] = useState([]);
     const [householdOrders, setHouseholdOrders] = useState([]);
     const [calendarConnected, setCalendarConnected] = useState(false);
@@ -39,6 +40,7 @@ const ShopContextProvider = (props) => {
         } catch (error) {
             toast.error(error.message);
         }
+        setMealsLoaded(true);
     }
 
 
@@ -184,6 +186,7 @@ const ShopContextProvider = (props) => {
             }
         } else {
             setMeals([]);
+            setMealsLoaded(false);
             setMyOrders([]);
             setHouseholdOrders([]);
             setCalendarConnected(false);
@@ -317,6 +320,7 @@ const ShopContextProvider = (props) => {
 
     const value = {
         meals,
+        mealsLoaded,
         fetchMeals,
         addMeal,
         updateMeal,

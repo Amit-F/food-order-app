@@ -7,7 +7,7 @@ import RelatedProducts from '../components/RelatedProducts';
 const Product = () => {
 
   const {productId} = useParams();
-  const {meals, addToCart, user} = useContext(ShopContext);
+  const {meals, mealsLoaded, addToCart, user} = useContext(ShopContext);
   const [productData,setProductData] = useState(false);
   const [image,setImage] = useState('');
   const [servingAmount,setServingAmount] = useState('');
@@ -93,7 +93,7 @@ const Product = () => {
       <RelatedProducts category={productData.category} subCategory={productData.subCategory} _id={productData._id}/>
 
     </div>
-  ) : (meals.length > 0 ? <p className='pt-14 text-center text-gray-500'>Meal not found.</p> : <div className='opacity-0'></div>)
+  ) : (mealsLoaded ? <p className='pt-14 text-center text-gray-500'>Meal not found.</p> : <div className='opacity-0'></div>)
 }
 
 export default Product

@@ -11,10 +11,10 @@ const About = () => {
       Whether it's optimizing a filtering algorithm, structuring a context provider, or debugging a subtle React rendering issue, I approach development with curiosity, discipline, and just enough humor to survive console.log at 2am.`;
 
     const projectText = `Feed Me started as a domestic efficiency experiment and evolved into a full-stack meal-planning system.
-      I built it for easier meal-prep: so my girlfriend could “order” meals I've previously cooked, select the number of servings, and schedule them for a specific date and time.
-      The app then converts that request into a calendar event — effectively bridging food preferences, portion planning, and time management.
+      I built it for easier meal-prep: so my fiancée could "order" meals I've cooked before and choose how many servings she'd like for the week.
+      Once she submits an order, I review it, schedule a real Google Calendar event for the grocery run, work through a shopping list automatically built from the order's ingredients, and schedule a second event for actually cooking — bridging food preferences, portion planning, and my actual calendar.
       A 2-serving request becomes dinner for two; 10 servings becomes a week of structured meal-prep.
-      Beyond being a fun relationship-powered feature, Feed Me also gave me the opportunity to think through state management, pricing calculations, and shared data across components in a practical setting. It turns out meal prep and clean architecture have more in common than I expected!`;
+      Beyond being a fun relationship-powered feature, Feed Me also gave me the opportunity to think through household-scoped data modeling, real OAuth integration, and shopping-list aggregation logic in a practical setting. It turns out meal prep and clean architecture have more in common than I expected!`;
 
   return (
     <div className='pt-8 border-t'>
