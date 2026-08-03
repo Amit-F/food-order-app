@@ -1,6 +1,7 @@
 import orderModel from "../models/orderModel.js"
 import mealModel from "../models/mealModel.js"
 import { createCalendarEvent } from "./calendarController.js"
+import aggregateShoppingList from "../services/aggregateShoppingList.js"
 
 const TIMEZONE = process.env.CALENDAR_TIMEZONE || 'Asia/Jerusalem'
 
@@ -30,6 +31,14 @@ const addMinutesToTime = (date, time, minutes) => {
 const buildOrderDescription = (order) => order.items
     .map((item) => `${item.mealId?.name || 'Meal'} — ${item.servings} servings${item.notes ? ` (${item.notes})` : ''}`)
     .join('\n')
+
+// Used for the shopping event specifically: the full household shopping list
+// (every ingredient across every order not yet shopped for), not just the one
+// order being scheduled — so opening the event at the store shows everything
+// to buy, even if another order came in after this one was placed.
+const buildShoppingListDescription = (items) => items.length
+    ? items.map((item) => `${item.quantity} ${item.unit} ${item.name}`).join('\n')
+    : 'Nothing to buy — no pending orders.'
 
 
 // Route for submitting an order (either role, scoped to the caller's household)
@@ -143,9 +152,11 @@ const scheduleShopping = async (req, res) => {
         const duration = durationMinutes || 60
         const { date: endDate, time: endTime } = addMinutesToTime(date, time, duration)
 
+        const shoppingItems = await aggregateShoppingList(req.user.householdId)
+
         const eventId = await createCalendarEvent(req.user.id, {
             summary: 'Grocery Shopping',
-            description: buildOrderDescription(order),
+            description: buildShoppingListDescription(shoppingItems),
             startDateTime: combineDateTime(date, time),
             endDateTime: combineDateTime(endDate, endTime),
             timeZone: TIMEZONE
