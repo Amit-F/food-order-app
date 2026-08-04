@@ -6,7 +6,7 @@ const CATEGORY_OPTIONS = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 const SUBCATEGORY_OPTIONS = ['Appetizer', 'Main', 'Dessert', 'Healthy', 'Beverage', 'Cocktail', 'Baked', 'Fried', 'Grilled', 'Soup', 'Salad'];
 const SERVINGS_OPTIONS = [2, 4, 6, 8, 10];
 
-const emptyIngredient = () => ({ name: '', quantity: '', unit: '' });
+const emptyIngredient = () => ({ name: '', quantity: '', unit: '', allergens: '' });
 
 // Each image slot holds: null (empty), a File (new upload), or a string (existing Cloudinary URL, edit mode only)
 const initialImages = (initialMeal) => {
@@ -27,7 +27,7 @@ const MealForm = ({ initialMeal, onSubmit, title, submitLabel, submittingLabel }
     const [servingsOptions, setServingsOptions] = useState(initialMeal?.servingsOptions || []);
     const [ingredients, setIngredients] = useState(
         initialMeal?.ingredients?.length
-            ? initialMeal.ingredients.map((ing) => ({ name: ing.name, quantity: ing.quantity, unit: ing.unit }))
+            ? initialMeal.ingredients.map((ing) => ({ name: ing.name, quantity: ing.quantity, unit: ing.unit, allergens: ing.allergens?.join(', ') || '' }))
             : [emptyIngredient()]
     );
     const [recommended, setRecommended] = useState(initialMeal?.bestSeller || false);
@@ -83,7 +83,12 @@ const MealForm = ({ initialMeal, onSubmit, title, submitLabel, submittingLabel }
             return;
         }
         const cleanIngredients = ingredients
-            .map((ing) => ({ name: ing.name.trim(), quantity: Number(ing.quantity), unit: ing.unit.trim() }))
+            .map((ing) => ({
+                name: ing.name.trim(),
+                quantity: Number(ing.quantity),
+                unit: ing.unit.trim(),
+                allergens: ing.allergens.split(',').map((tag) => tag.trim()).filter(Boolean)
+            }))
             .filter((ing) => ing.name && ing.unit && ing.quantity > 0);
         if (cleanIngredients.length === 0) {
             toast.error('Add at least one ingredient with a name, quantity, and unit');
@@ -225,6 +230,13 @@ const MealForm = ({ initialMeal, onSubmit, title, submitLabel, submittingLabel }
                                 placeholder='Unit (e.g. g, cup)'
                                 value={ingredient.unit}
                                 onChange={(e) => updateIngredient(index, 'unit', e.target.value)}
+                            />
+                            <input
+                                className='w-40 px-3 py-2 border border-gray-300'
+                                type="text"
+                                placeholder='Allergens (optional, comma-separated)'
+                                value={ingredient.allergens}
+                                onChange={(e) => updateIngredient(index, 'allergens', e.target.value)}
                             />
                             <button type="button" onClick={() => removeIngredientRow(index)} className='px-2 text-gray-500 hover:text-black'>✕</button>
                         </div>

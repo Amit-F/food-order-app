@@ -94,7 +94,12 @@ const Product = () => {
          {productData.ingredients.length === 0
            ? <p className='italic'>No ingredients added yet{user?.role === 'cook' && <> — <Link to={`/edit-meal/${productData._id}`} className='underline'>add some</Link></>}.</p>
            : productData.ingredients.map((ingredient, index) => (
-             <p key={index}>{ingredient.quantity} {ingredient.unit} {ingredient.name}</p>
+             <p key={index}>
+               {ingredient.quantity} {ingredient.unit} {ingredient.name}
+               {ingredient.allergens?.length > 0 && (
+                 <span className='ml-2 text-xs text-red-600'>⚠ Contains: {ingredient.allergens.join(', ')}</span>
+               )}
+             </p>
            ))
          }
         </div>

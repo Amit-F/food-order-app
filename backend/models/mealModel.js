@@ -26,7 +26,8 @@ const mealSchema = new mongoose.Schema({
     ingredients: [{
         name: { type: String, required: true },
         quantity: { type: Number, required: true },
-        unit: { type: String, required: true }
+        unit: { type: String, required: true },
+        allergens: { type: [String], default: [] }
     }],
     bestSeller: { type: Boolean, default: false },
     date: { type: Date, default: Date.now }
