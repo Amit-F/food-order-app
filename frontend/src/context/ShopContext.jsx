@@ -285,6 +285,40 @@ const ShopContextProvider = (props) => {
     }
 
 
+    const addReview = async (formData) => {
+        try {
+            const response = await axios.post(backendUrl + '/api/review/add', formData, authHeader());
+            if (response.data.success) {
+                toast.success('Review posted!');
+                return true;
+            } else {
+                toast.error(response.data.message);
+                return false;
+            }
+        } catch (error) {
+            toast.error(error.message);
+            return false;
+        }
+    }
+
+
+    const removeReview = async (id) => {
+        try {
+            const response = await axios.post(backendUrl + '/api/review/remove', { id }, authHeader());
+            if (response.data.success) {
+                toast.success('Review removed.');
+                return true;
+            } else {
+                toast.error(response.data.message);
+                return false;
+            }
+        } catch (error) {
+            toast.error(error.message);
+            return false;
+        }
+    }
+
+
     const reorder = (order) => {
         const addable = order.items.filter((item) => item.mealId);
         if (addable.length === 0) {
@@ -403,7 +437,9 @@ const ShopContextProvider = (props) => {
         cancelOrder,
         favoriteMealIds,
         toggleFavorite,
-        reorder
+        reorder,
+        addReview,
+        removeReview
 
     }
 

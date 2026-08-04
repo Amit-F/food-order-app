@@ -1,16 +1,20 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 import { ShopContext } from '../context/ShopContext';
 import { assets } from '../assets/assets';
 import RelatedProducts from '../components/RelatedProducts';
+import ReviewForm from '../components/ReviewForm';
 
 const Product = () => {
 
   const {productId} = useParams();
-  const {meals, mealsLoaded, addToCart, user, favoriteMealIds, toggleFavorite} = useContext(ShopContext);
+  const {meals, mealsLoaded, addToCart, user, favoriteMealIds, toggleFavorite, backendUrl, token, removeReview} = useContext(ShopContext);
   const [productData,setProductData] = useState(false);
   const [image,setImage] = useState('');
   const [servingAmount,setServingAmount] = useState('');
+  const [reviews, setReviews] = useState([]);
 
   const fetchProductData = async () => {
 
@@ -26,6 +30,33 @@ const Product = () => {
   useEffect(()=> {
     fetchProductData();
   },[productId, meals])
+
+  const fetchReviews = useCallback(async () => {
+    try {
+      const response = await axios.get(backendUrl + '/api/review/meal/' + productId, { headers: { Authorization: `Bearer ${token}` } });
+      if (response.data.success) {
+        setReviews(response.data.reviews);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }, [backendUrl, token, productId])
+
+  useEffect(() => {
+    if (token && productId) {
+      fetchReviews();
+    }
+  }, [token, productId, fetchReviews])
+
+  const handleRemoveReview = async (id) => {
+    const success = await removeReview(id);
+    if (success) fetchReviews();
+  }
+
+  const averageRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0;
+  const roundedStars = Math.round(averageRating);
 
   return productData ? (
     <div className='pt-10 transition-opacity duration-500 ease-in border-t-2 opacity-100'>
@@ -62,12 +93,16 @@ const Product = () => {
               </div>
             </div>
             <div className='flex items-center gap-1 mt-2'>
-              <img src={assets.star_icon} alt="" className="w-3 5" />
-              <img src={assets.star_icon} alt="" className="w-3 5" />
-              <img src={assets.star_icon} alt="" className="w-3 5" />
-              <img src={assets.star_icon} alt="" className="w-3 5" />
-              <img src={assets.star_dull_icon} alt="" className="w-3 5" />
-              <p className='pl-2'>(2)</p>
+              {reviews.length === 0 ? (
+                <p className='text-sm text-gray-500'>No reviews yet</p>
+              ) : (
+                <>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <img key={star} src={star <= roundedStars ? assets.star_icon : assets.star_dull_icon} alt="" className="w-3 5" />
+                  ))}
+                  <p className='pl-2'>{averageRating.toFixed(1)} ({reviews.length})</p>
+                </>
+              )}
             </div>
             <p className='mt-1 text-sm font-medium'>[{productData.category.join(", ")} | {productData.subCategory.join(", ")}]</p>
             <p className='mt-5 text-gray-500 md:w-4/5'>{productData.description}</p>
@@ -102,6 +137,47 @@ const Product = () => {
              </p>
            ))
          }
+        </div>
+      </div>
+
+      {/* ------- Reviews ------- */}
+
+      <div className='mt-10'>
+        <div className='flex'>
+          <b className='px-5 py-3 text-sm border'>Reviews</b>
+        </div>
+        <div className='flex flex-col gap-4 px-6 py-6 border'>
+          {user && (
+            <ReviewForm mealId={productData._id} onSubmitted={fetchReviews} />
+          )}
+          {reviews.length === 0
+            ? <p className='text-sm italic text-gray-500'>No reviews yet.</p>
+            : reviews.map((review) => (
+              <div key={review._id} className='flex flex-col gap-2 pb-4 border-b last:border-b-0'>
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center gap-2'>
+                    <span className='text-sm font-medium'>{review.userId?.name || 'Someone'}</span>
+                    <div className='flex gap-0.5'>
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <img key={star} src={star <= review.rating ? assets.star_icon : assets.star_dull_icon} alt="" className="w-3 h-3" />
+                      ))}
+                    </div>
+                  </div>
+                  {user && review.userId?._id === user._id && (
+                    <button onClick={() => handleRemoveReview(review._id)} className='text-xs text-gray-500 underline'>Delete</button>
+                  )}
+                </div>
+                <p className='text-sm text-gray-600'>{review.text}</p>
+                {review.photos?.length > 0 && (
+                  <div className='flex gap-2'>
+                    {review.photos.map((url, index) => (
+                      <img key={index} src={url} className='object-cover w-20 h-20 border' alt="" />
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))
+          }
         </div>
       </div>
 
