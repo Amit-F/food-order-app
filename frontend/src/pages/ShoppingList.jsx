@@ -12,6 +12,10 @@ const ShoppingList = () => {
 
     const authHeader = () => ({ headers: { Authorization: `Bearer ${token}` } });
 
+    // Aggregated quantities are floating-point sums and can show noise like
+    // 3.4999999999999996 — round for display/export only, never re-store.
+    const formatQuantity = (quantity) => Math.round(quantity * 100) / 100;
+
     const fetchList = async () => {
         try {
             const response = await axios.get(backendUrl + '/api/shopping-list', authHeader());
@@ -61,10 +65,29 @@ const ShoppingList = () => {
         return <p className='pt-14 text-center'>Loading...</p>
     }
 
+    const copyToClipboard = async () => {
+        const text = items.map((item) => `${formatQuantity(item.quantity)} ${item.unit} ${item.name}`).join('\n');
+        try {
+            await navigator.clipboard.writeText(text);
+            toast.success('Shopping list copied!');
+        } catch {
+            toast.error('Could not copy to clipboard');
+        }
+    }
+
     return (
         <div className='pt-16 border-t'>
-            <div className='text-2xl'>
-                <Title text1={'SHOPPING'} text2={'LIST'}/>
+            <div className='flex items-center justify-between'>
+                <div className='text-2xl'>
+                    <Title text1={'SHOPPING'} text2={'LIST'}/>
+                </div>
+                <button
+                    onClick={copyToClipboard}
+                    disabled={items.length === 0}
+                    className='px-4 py-2 text-sm text-white bg-black disabled:opacity-50'
+                >
+                    Copy to Clipboard
+                </button>
             </div>
             <p className='mt-2 text-sm text-gray-500'>Aggregated from every order that hasn't been shopped for yet.</p>
 
@@ -76,7 +99,7 @@ const ShoppingList = () => {
                         <label key={index} className='flex items-center gap-3 py-3 border-t last:border-b cursor-pointer'>
                             <input type="checkbox" checked={item.checked} onChange={()=>toggleItem(item)} />
                             <span className={item.checked ? 'line-through text-gray-400' : ''}>
-                                {item.quantity} {item.unit} {item.name}
+                                {formatQuantity(item.quantity)} {item.unit} {item.name}
                             </span>
                         </label>
                     ))
