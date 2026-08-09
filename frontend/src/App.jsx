@@ -7,6 +7,8 @@ import Contact from './pages/Contact'
 import Product from './pages/Product'
 import Cart from './pages/Cart'
 import Login from './pages/Login'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import JoinHousehold from './pages/JoinHousehold'
 import Invite from './pages/Invite'
 import AddMeal from './pages/AddMeal'
@@ -39,6 +41,8 @@ const App = () => {
         <Route path='/product/:productId' element={<Product/>} />
         <Route path='/cart' element={<Cart/>} />
         <Route path='/login' element={<Login/>} />
+        <Route path='/forgot-password' element={<ForgotPassword/>} />
+        <Route path='/reset-password/:token' element={<ResetPassword/>} />
         <Route path='/join/:code' element={<JoinHousehold/>} />
         <Route path='/invite' element={<Invite/>} />
         <Route path='/add-meal' element={<AddMeal/>} />

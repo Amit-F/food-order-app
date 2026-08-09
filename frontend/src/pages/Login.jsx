@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { ShopContext } from '../context/ShopContext'
 
 const Login = () => {
@@ -35,6 +36,7 @@ const Login = () => {
       {currentState === 'Sign Up' ? <input onChange={(e)=>setHouseholdName(e.target.value)} value={householdName} type="text" className='w-full px-3 py-2 border border-gray-800' placeholder="Kitchen name (optional)"/> : ''}
       <div className='w-full flex justify-between text-sm mt-[-8px]'>
         <p>Ordering from someone? Ask them for your invite link.</p>
+        {currentState === 'Login' && <Link to='/forgot-password' className='underline whitespace-nowrap'>Forgot password?</Link>}
       </div>
       <div className='w-full flex justify-between text-sm'>
         {

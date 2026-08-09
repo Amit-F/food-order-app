@@ -308,6 +308,26 @@ const ShopContextProvider = (props) => {
     }
 
 
+    const forgotPassword = async (email) => {
+        try {
+            const response = await axios.post(backendUrl + '/api/user/forgot-password', { email });
+            return response.data;
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+
+    const resetPassword = async (token, password) => {
+        try {
+            const response = await axios.post(backendUrl + '/api/user/reset-password', { token, password });
+            return response.data;
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+
     const logout = () => {
         setToken('');
         setUser(null);
@@ -474,6 +494,8 @@ const ShopContextProvider = (props) => {
         login,
         registerCook,
         registerOrderer,
+        forgotPassword,
+        resetPassword,
         logout,
         myOrders,
         fetchMyOrders,
