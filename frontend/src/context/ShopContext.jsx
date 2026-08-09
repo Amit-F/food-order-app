@@ -23,6 +23,7 @@ const ShopContextProvider = (props) => {
     const [householdOrders, setHouseholdOrders] = useState([]);
     const [calendarConnected, setCalendarConnected] = useState(false);
     const [favoriteMealIds, setFavoriteMealIds] = useState(() => user?.favoriteMealIds || []);
+    const [suggestions, setSuggestions] = useState([]);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -122,6 +123,54 @@ const ShopContextProvider = (props) => {
     }
 
 
+    const addSuggestion = async (text) => {
+        try {
+            const response = await axios.post(backendUrl + '/api/suggestion/add', { text }, authHeader());
+            if (response.data.success) {
+                toast.success('Thanks — sent!');
+                return true;
+            } else {
+                toast.error(response.data.message);
+                return false;
+            }
+        } catch (error) {
+            toast.error(error.message);
+            return false;
+        }
+    }
+
+
+    const fetchSuggestions = async () => {
+        try {
+            const response = await axios.get(backendUrl + '/api/suggestion/list', authHeader());
+            if (response.data.success) {
+                setSuggestions(response.data.suggestions);
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+
+    const removeSuggestion = async (id) => {
+        try {
+            const response = await axios.post(backendUrl + '/api/suggestion/remove', { id }, authHeader());
+            if (response.data.success) {
+                await fetchSuggestions();
+                return true;
+            } else {
+                toast.error(response.data.message);
+                return false;
+            }
+        } catch (error) {
+            toast.error(error.message);
+            return false;
+        }
+    }
+
+
     const connectCalendar = async () => {
         try {
             const response = await axios.get(backendUrl + '/api/calendar/connect', authHeader());
@@ -188,12 +237,16 @@ const ShopContextProvider = (props) => {
             if (user?.role === 'cook') {
                 fetchCalendarStatus();
             }
+            if (user?.isOwner) {
+                fetchSuggestions();
+            }
         } else {
             setMeals([]);
             setMealsLoaded(false);
             setMyOrders([]);
             setHouseholdOrders([]);
             setCalendarConnected(false);
+            setSuggestions([]);
         }
     }, [token])
 
@@ -439,7 +492,11 @@ const ShopContextProvider = (props) => {
         toggleFavorite,
         reorder,
         addReview,
-        removeReview
+        removeReview,
+        suggestions,
+        addSuggestion,
+        fetchSuggestions,
+        removeSuggestion
 
     }
 

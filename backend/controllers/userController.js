@@ -7,8 +7,10 @@ import inviteModel from "../models/inviteModel.js";
 import mealModel from "../models/mealModel.js";
 
 
+const isOwner = (user) => user.email === process.env.APP_OWNER_EMAIL
+
 const createToken = (user) => {
-    return jwt.sign({ id: user._id, role: user.role, householdId: user.householdId }, process.env.JWT_SECRET)
+    return jwt.sign({ id: user._id, role: user.role, householdId: user.householdId, isOwner: isOwner(user) }, process.env.JWT_SECRET)
 }
 
 const userResponse = (user) => ({
@@ -17,7 +19,8 @@ const userResponse = (user) => ({
     email: user.email,
     role: user.role,
     householdId: user.householdId,
-    favoriteMealIds: user.favoriteMealIds || []
+    favoriteMealIds: user.favoriteMealIds || [],
+    isOwner: isOwner(user)
 })
 
 

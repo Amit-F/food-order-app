@@ -12,7 +12,7 @@ const requireAuth = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = { id: decoded.id, role: decoded.role, householdId: decoded.householdId };
+        req.user = { id: decoded.id, role: decoded.role, householdId: decoded.householdId, isOwner: decoded.isOwner };
         next();
     } catch (error) {
         return res.status(401).json({ success: false, message: "Not Authorized, please login again" })
@@ -30,4 +30,14 @@ const requireRole = (role) => (req, res, next) => {
 
 }
 
-export { requireAuth, requireRole }
+const requireOwner = (req, res, next) => {
+
+    if (!req.user || !req.user.isOwner) {
+        return res.status(403).json({ success: false, message: "Forbidden" })
+    }
+
+    next();
+
+}
+
+export { requireAuth, requireRole, requireOwner }

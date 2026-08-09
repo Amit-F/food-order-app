@@ -16,7 +16,8 @@ const AdminDashboard = () => {
   const {
     user, householdOrders, fetchHouseholdOrders,
     calendarConnected, connectCalendar,
-    scheduleShopping, markShoppingDone, scheduleCooking, markCookingDone, cancelOrder
+    scheduleShopping, markShoppingDone, scheduleCooking, markCookingDone, cancelOrder,
+    suggestions, fetchSuggestions, removeSuggestion
   } = useContext(ShopContext);
 
   const [openSchedule, setOpenSchedule] = useState(null); // { orderId, type: 'shopping' | 'cooking' } | null
@@ -27,6 +28,9 @@ const AdminDashboard = () => {
   useEffect(()=>{
     if (user?.role === 'cook') {
       fetchHouseholdOrders();
+    }
+    if (user?.isOwner) {
+      fetchSuggestions();
     }
   },[user])
 
@@ -132,6 +136,29 @@ const AdminDashboard = () => {
           ))
         }
       </div>
+
+      {user.isOwner && (
+        <div className='mt-16'>
+          <div className='text-2xl'>
+            <Title text1={'OWNER'} text2={'SUGGESTIONS'}/>
+          </div>
+          <div className='mt-4'>
+            {
+              suggestions.length === 0
+              ? <p className='py-8 text-gray-500'>No suggestions yet.</p>
+              : suggestions.map((suggestion)=>(
+                <div key={suggestion._id} className='flex items-start justify-between gap-4 py-4 text-gray-700 border-t last:border-b'>
+                  <div>
+                    <p className='text-sm font-medium'>{suggestion.authorId?.name || 'Someone'} · <span className='text-sm text-gray-500'>{new Date(suggestion.createdAt).toLocaleDateString()}</span></p>
+                    <p className='mt-1 text-sm text-gray-600'>{suggestion.text}</p>
+                  </div>
+                  <button onClick={()=>removeSuggestion(suggestion._id)} className='text-xs text-gray-500 underline whitespace-nowrap'>Delete</button>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      )}
     </div>
   )
 }
