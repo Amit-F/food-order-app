@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
     role: { type: String, enum: ['cook', 'orderer'], required: true },
     householdId: { type: mongoose.Schema.Types.ObjectId, ref: "household", required: true },
     favoriteMealIds: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: "meal" }], default: [] },
+    resetPasswordTokenHash: { type: String, select: false },
+    resetPasswordExpires: { type: Date, select: false },
     google: {
         connected: { type: Boolean, default: false },
         refreshToken: { type: String, select: false },

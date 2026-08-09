@@ -1,10 +1,12 @@
 import validator from "validator"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import crypto from "crypto"
 import userModel from "../models/userModel.js";
 import householdModel from "../models/householdModel.js";
 import inviteModel from "../models/inviteModel.js";
 import mealModel from "../models/mealModel.js";
+import { sendPasswordResetEmail } from "../utils/sendEmail.js";
 
 
 const isOwner = (user) => user.email === process.env.APP_OWNER_EMAIL
@@ -211,4 +213,81 @@ const toggleFavorite = async (req, res) => {
 }
 
 
-export { registerCook, registerOrderer, loginUser, toggleFavorite }
+// Route for requesting a password reset (public). Always responds with the
+// same generic message regardless of whether the email is registered, to
+// avoid leaking which emails have accounts.
+const forgotPassword = async (req, res) => {
+
+    try {
+
+        const { email } = req.body
+
+        const genericMessage = "If that email is registered, a password reset link has been sent."
+
+        const user = await userModel.findOne({ email })
+
+        if (user) {
+            const rawToken = crypto.randomBytes(32).toString('hex')
+            user.resetPasswordTokenHash = crypto.createHash('sha256').update(rawToken).digest('hex')
+            user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
+            await user.save()
+
+            const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${rawToken}`
+            console.log(`Password reset link for ${email}: ${resetUrl}`)
+            try {
+                await sendPasswordResetEmail(email, resetUrl)
+            } catch (emailError) {
+                // Don't let email-delivery failures leak through the response or
+                // break the generic-message guarantee below.
+                console.log('Failed to send password reset email:', emailError.message)
+            }
+        }
+
+        res.json({ success: true, message: genericMessage })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+
+}
+
+
+// Route for completing a password reset (public)
+const resetPassword = async (req, res) => {
+
+    try {
+
+        const { token, password } = req.body
+
+        if (!password || password.length < 8) {
+            return res.json({ success: false, message: "Please enter a strong password of at least 8 characters" })
+        }
+
+        const tokenHash = crypto.createHash('sha256').update(token || '').digest('hex')
+
+        const user = await userModel
+            .findOne({ resetPasswordTokenHash: tokenHash, resetPasswordExpires: { $gt: new Date() } })
+            .select('+resetPasswordTokenHash +resetPasswordExpires')
+
+        if (!user) {
+            return res.json({ success: false, message: "This reset link is invalid or has expired. Please request a new one." })
+        }
+
+        const salt = await bcrypt.genSalt(10)
+        user.password = await bcrypt.hash(password, salt)
+        user.resetPasswordTokenHash = undefined
+        user.resetPasswordExpires = undefined
+        await user.save()
+
+        res.json({ success: true, message: "Password updated. You can now log in." })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+
+}
+
+
+export { registerCook, registerOrderer, loginUser, toggleFavorite, forgotPassword, resetPassword }
