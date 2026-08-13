@@ -20,7 +20,7 @@ connectCloudinary()
 
 // Middlewares
 app.use(express.json()) // any request will be passed as json
-app.use(cors()) // access backend from any ip
+app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }))
 
 // API Endpoints
 app.use('/api/user',userRouter)
