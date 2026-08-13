@@ -20,7 +20,7 @@ import ShoppingList from './pages/ShoppingList'
 import CalendarConnected from './pages/CalendarConnected'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
-import Searchbar from './components/Searchbar'
+import Searchbar from './components/SearchBar'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ScrollToTop from './components/ScrollToTop'
